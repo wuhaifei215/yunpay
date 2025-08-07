@@ -1,0 +1,89 @@
+<aside class="left-sidebar">
+    <ul class="nav-bar navbar-inverse hidden-xs-down">
+        <li class="nav-item"> <a class="nav-link navbar-toggler sidebartoggler  waves-effect waves-dark float-right" href="javascript:void(0)"><span class="navbar-toggler-icon"></span></a> </li>
+    </ul>
+    <!-- Sidebar scroll-->
+    <div class="scroll-sidebar">
+        <!-- Sidebar navigation-->
+        <nav class="sidebar-nav">
+            <ul id="sidebarnav">
+                <li class="clearfix"></li>
+                <li class="active"> <a class="has-arrow waves-effect waves-dark" href="<{:U('Index/index')}>"><i class="flaticon-desktop-computer-screen-with-rising-graph"></i><span class="hide-menu">管理中心</span></a>
+                </li>
+                <li> <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="flaticon-user"></i><span class="hide-menu">账户管理</span></a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li><a href="<{:U("Account/google")}>" target="iframe0">Google身份验证</a></li>
+                        <li><a href="<{:U("Account/editPassword")}>" target="iframe0">登录密码</a></li>
+                        <li><a href="<{:U("Account/editPaypassword")}>" target="iframe0">支付密码</a></li>
+                        <li><a href="<{:U("Account/loginrecord")}>" target="iframe0">登录记录</a></li>
+                    </ul>
+                </li>
+                <neq name="fans[groupid]" value="4">
+                    <neq name="fans[groupid]" value="8">
+                        <li> <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="flaticon-growth"></i><span class="hide-menu">子商户管理</span></a>
+                            <ul aria-expanded="false" class="collapse">
+                                <li><a href="<{:U("Agent/member")}>" target="iframe0">商户列表</a></li>
+                                <if condition="$fans[groupid] eq 7">
+                                    <li><a href="<{:U("Agent/agorder")}>" target="iframe0">商户代收统计</a></li>
+                                    <li><a href="<{:U("Agent/withdrawal")}>" target="iframe0">商户代付统计</a></li>
+                                </if>
+                            </ul>
+                        </li>
+                    </neq>
+                </neq>
+                <eq name="fans[groupid]" value="4">
+                    <li> <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="flaticon-forms"></i><span class="hide-menu">代收管理</span></a>
+                        <ul aria-expanded="false" class="collapse">
+                            <li><a href="<{:U("Order/index")}>" target="iframe0">代收订单</a></li>
+                        </ul>
+                    </li>
+                </eq>
+                <eq name="fans[groupid]" value="4">
+                <li> <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="flaticon-badge"></i><span class="hide-menu">代付管理</span></a>
+                    <ul aria-expanded="false" class="collapse">
+                        <!--<if condition="$siteconfig['payingservice']">-->
+                        <!--    <li><a href="<{:U("Withdrawal/dfapply")}>" target="iframe0">代付申请</a></li>-->
+                            <li><a href="<{:U("Withdrawal/dfapplyU",['currency'=>'PHP'])}>" target="iframe0">U下发申请(1)</a></li>
+                            <!--<li><a href="<{:U("Withdrawal/dfapplyU",['currency'=>'INR'])}>" target="iframe0">U下发申请(2)</a></li>-->
+                            <li><a href="<{:U("Withdrawal/payment",['type'=>2])}>" target="iframe0">U下发订单</a></li>
+                        <!--</if>-->
+                        <li><a href="<{:U("Withdrawal/payment")}>" target="iframe0">代付订单</a></li>
+                        <!--</if>-->
+                    </ul>
+                </li>
+                </eq>
+                <if condition="$fans[groupid] eq 4 or $fans[groupid] eq 5">
+                    <li> <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="flaticon-check"></i><span class="hide-menu">财务管理</span></a>
+                        <ul aria-expanded="false" class="collapse">
+                            <li><a href="<{:U("Account/changeRecord")}>" target="iframe0">流水记录</a></li>
+                            <eq name="fans[groupid]" value="4">
+                                <li><a href="<{:U("Account/reconciliation")}>" target="iframe0">对账单</a></li>
+                            </eq>
+                            <neq name="fans[groupid]" value="5">
+                            <li><a href="<{:U("Account/b2Btransfer")}>" target="iframe0">商户内转</a></li>
+                            </neq>
+                            <eq name="fans[groupid]" value="5">
+                            <li><a href="<{:U("Account/b2Btransfer2")}>" target="iframe0">商户内转</a></li>
+                            </eq>
+                        </ul>
+                    </li>
+                    <!--<li> <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="flaticon-share"></i><span class="hide-menu">API管理</span></a>-->
+                    <!--    <ul aria-expanded="false" class="collapse">-->
+                    <!--        <li><a href="<{:U("Channel/index")}>" target="iframe0">查看通道费率</a></li>-->
+                    <!--        <eq name="fans[groupid]" value="4">-->
+                    <!--            <li><a href="<{:U("Channel/apidocumnet")}>" target="iframe0">API密钥</a></li>-->
+                    <!--        </eq>-->
+                    <!--    </ul>-->
+                    <!--</li>-->
+                    <li> <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="flaticon-speech"></i><span class="hide-menu">下载中心</span></a>
+                        <ul aria-expanded="false" class="collapse">
+                            <li><a href="<{:U("download/index")}>" target="iframe0">下载列表</a></li>
+                        </ul>
+                    </li>
+                </if>
+            </ul>
+        </nav>
+        <!-- End Sidebar navigation -->
+    </div>
+    <!-- End Sidebar scroll-->
+</aside>

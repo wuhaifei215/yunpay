@@ -1,0 +1,254 @@
+<include file="Public/header"/>
+<div class="row">
+  <!--<div class="col-sm-12" style="<if condition="$get_data eq 1">display:none;</if>">-->
+  <!--  <form class="layui-form layui-form-pane form-search" action="" method="post" autocomplete="off" id="withdrawalform">-->
+  <!--      <input type="hidden" name="get_data" value="1">-->
+  <!--      <div class="col-md-12">-->
+  <!--          <button type="submit" class="fa fa-warning layui-btn-danger" style="line-height:25px;font-size:20px;color:#fff;padding:10px;" id="loading-example-btn" data-loading-text="正在处理..." data-target="#withdrawalform" >-->
+  <!--              请点击这里获取数据。统计耗时较长，点击后请耐心等待-->
+  <!--          </button>-->
+  <!--        </div>-->
+  <!--      </div>-->
+  <!--  </form>-->
+  <!--</div>-->
+  <div class="col-sm-12">
+    <if condition="$installpwd eq $member['password']">
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <i class="fa fa-warning"></i>警告！您目前使用的是默认密码，请尽快修改！
+      </div>
+    </if>
+  </div>
+</div>
+<div class="row zuy-nav">
+      <div class="col-sm-12">
+    <div class="ibox float-e-margins" style="text-align: center;">
+      <div class="ibox-title" style="width:100%">
+        <h5>欢迎使用 YUN-PH 支付管理系统</h5>
+      </div>
+      <div class="ibox-content" style="padding-top:5px"></div>
+  </div>
+<!--  <div class="col-sm-4">-->
+<!--    <div class="ibox float-e-margins">-->
+<!--      <div class="ibox-title">-->
+<!--        <h5><{$stat.month_allordersum|number_format}></h5>-->
+<!--      </div>-->
+<!--      <div class="ibox-content" style="padding-top:0;height: 67px">-->
+<!--        <h1 class="no-margins">本月平台总入金</h1>-->
+<!--        <i class="iconfont icon-cunqianguan" style="color: #fff1f3;"></i>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <div class="col-sm-4">-->
+<!--    <div class="ibox float-e-margins">-->
+<!--      <div class="ibox-title">-->
+<!--        <h5><{$stat.today_allordercount|number_format}></h5>-->
+<!--      </div>-->
+<!--      <div class="ibox-content" style="padding-top:0;height: 67px">-->
+<!--        <h1 class="no-margins">今日平台成功总进单量</h1>-->
+<!--        <i class="iconfont icon-tuiguangzhuanqian" style="color: #fff1f3;"></i>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <div class="col-sm-4" >-->
+<!--    <div class="ibox float-e-margins">-->
+<!--      <div class="ibox-title">-->
+<!--        <h5><{$stat.month_platform_income|number_format}></h5>-->
+<!--      </div>-->
+<!--      <div class="ibox-content" style="padding-top:0;height: 67px">-->
+<!--        <h1 class="no-margins">本月平台总分成</h1>-->
+<!--        <i class="iconfont icon-iconfontjikediancanicon20" style="color: #f0faf8;"></i>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <div class="col-sm-4">-->
+<!--    <div class="ibox float-e-margins">-->
+<!--      <div class="ibox-title">-->
+<!--        <h5><{$stat.today_allordersum|number_format}></h5>-->
+<!--      </div>-->
+<!--      <div class="ibox-content" style="padding-top:0;height: 67px">-->
+<!--        <h1 class="no-margins">今日平台总入金</h1>-->
+<!--        <i class="iconfont icon-qianbao" style="color: #edf7fe;"></i>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <div class="col-sm-4" style="height: 140px">-->
+<!--    <div class="ibox float-e-margins">-->
+<!--      <div class="ibox-title">-->
+<!--        <h5><{$stat.today_withdraw_money|number_format}></h5>-->
+<!--      </div>-->
+<!--      <div class="ibox-content" style="padding-top:0;height: 67px">-->
+<!--        <h1 class="no-margins">今日平台总出款</h1>-->
+<!--        <i class="iconfont icon-shourusel" style="color: #fff6f0;"></i>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <div class="col-sm-4" style="height: 140px">-->
+<!--    <div class="ibox float-e-margins">-->
+<!--      <div class="ibox-title">-->
+<!--        <h5><{$stat.today_platform_income|number_format}></h5>-->
+<!--      </div>-->
+<!--      <div class="ibox-content" style="padding-top:0;height: 67px">-->
+<!--        <h1 class="no-margins">今日平台总分成</h1>-->
+<!--        <i class="iconfont icon-shouru" style="color: #eff2fe;"></i>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="ibox float-e-margins" >
+      <div class="ibox-title">
+        <h5>24小时内交易统计</h5>
+      </div>
+      <div class="ibox-content" style="padding:14px 20px;">
+        <div id="dday" style="height:315px; margin-top: -40px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<!-- 全局js -->
+<include file="Public/footer"/>
+<script>
+    layui.use(['laypage', 'layer', 'form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+        });
+    function reset_pwd(title,url,w,h){
+      x_admin_show(title,url,w,h);
+    }
+</script>
+<script src="/Public/Front/js/echarts.common.min.js"></script>
+<script>
+    var myChartmonth = echarts.init(document.getElementById('dday'));
+    // 使用刚指定的配置项和数据显示图表。
+    myChartmonth.setOption({
+        grid:{
+            x:100,
+            x2:100,
+            y:70,
+            y2:40,
+            borderWidth:1
+        },
+        title : {
+            text: '',
+            subtext: ''
+        },
+        tooltip : {
+            trigger: 'axis'
+        },
+        legend: {
+            x: 'center',
+            y: '0',
+            data:['交易金额','手续费金额'],
+            textStyle:{
+                fontSize:14,
+                color:'#b2b5c4'
+            }
+        },
+        toolbox: {
+            show : false,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [
+            {
+                axisLabel:{
+                    textStyle:{
+                        fontSize:14,
+                        color:'#5b6e89'
+                    }
+                },
+                type : 'category',
+                boundaryGap : false,
+                data : [<{$list_d_str}>]
+            }
+        ],
+        yAxis : [
+            {
+                splitLine:{
+                    show: true,
+                    lineStyle:{
+                        type:"dashed",
+                        color:"#dfdfdf"
+                    }
+                },
+                axisLabel:{
+                    textStyle:{
+                        fontSize:14,
+                        color:'#5b6e89'
+                    }
+                },
+                type : 'value'
+            }
+        ],
+        series : [
+            {
+                name:'交易金额',
+                type:'line',
+                smooth:true,
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            type: 'default',
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [{
+                                    offset: 0, color: '#ffe9da'
+                                }, {
+                                    offset: 1, color: '#ffffff'
+                                }],
+                                globalCoord: false
+                            }
+                        }
+                        ,color:'#ff8b88'
+                    }
+                },
+                data:[<{$list_d.amount|implode=","}>]
+            },
+            {
+                name:'手续费金额',
+                type:'line',
+                smooth:true,
+
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            type: 'default',
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [{
+                                    offset: 0, color: '#ffe9db'
+                                }, {
+                                    offset: 1, color: '#ffffff'
+                                }],
+                                globalCoord: false
+                            }
+                        }
+                        ,color:'#ffd74c'
+                    }
+                },
+                data:[<{$list_d.rate|implode=","}>]
+            }
+        ]
+    });
+</script>
+<{:tongji(0)}>
+</body>
+</html>

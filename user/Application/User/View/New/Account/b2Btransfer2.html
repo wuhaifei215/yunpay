@@ -1,0 +1,163 @@
+<include file="Public/header"/>
+<style type="text/css">
+    .layui-form-label{width:150px;}
+    .layui-form-select {width:200px; }
+    .channel_tr td {width:350px;}
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex m-b-10 no-block">
+                        <h5 class="card-title m-b-0 align-self-center">
+                            商户内转
+                            <span class="text-danger"></span>
+                        </h5>
+                    </div>
+                    <blockquote class="layui-elem-quote" style="font-size:14px;padding;8px;max-width:550px;">
+                        <table>
+                            <thead>
+                                <tr class="layui-table channel_tr">
+                                    <td style="background-color:#8da6f3;">商户名</td>
+                                    <td>可用余额</td>
+                                    <td style="background-color:#8da6f3;">商户名</td>
+                                    <td>可用余额</td>
+                                <tr/>
+                                <volist name="members" id="vo" key="k">
+                                    <if condition="$k%2 eq 1">
+                                    <tr class="layui-table channel_tr">
+                                    </if>
+                                        <td style="background-color:#8da6f3;"><{$vo.username}></td>
+                                        <td><span style="color: red;font-weight: 600;"><{$vo.balance_php}></span></td>
+                                    <if condition="$k%2 eq 0">
+                                    <tr/>
+                                    </if>
+                                </volist>
+                            </thead>
+                        </table>
+                    </blockquote>
+                    <blockquote class="layui-elem-quote" style="font-size:14px;padding;8px;max-width:550px;">
+                        <table>
+                            <thead>
+                                <tr class="layui-table channel_tr">
+                                    <td style="background-color:#8da6f3;">总余额</td>
+                                    <td><span style="color: red;font-weight: 600;"><{$allbalance_php}></span></td>
+                                <tr/>
+                            </thead>
+                        </table>
+                    </blockquote>
+                    <form class="layui-form layui-table-body" id="df_form" style="min-height: 550px;">
+                    
+                    <table class="layui-table">
+                            <thead id="container">
+                                <!--<tr>-->
+                                <!--    <td style="width:200px;fload:right;">货币类型</td>-->
+                                <!--    <td>-->
+                                <!--        <select name="currency" class="layui-select df_item" lay-search lay-verify="required">-->
+                                <!--        <option value="">请直接选择</option>-->
+                                <!--        <option value="BRL">巴西雷亚尔</option>-->
+                                <!--        </select>-->
+                                <!--    </td>-->
+                                <!--</tr>-->
+                                <tr>
+                                    <td style="width:150px;fload:right;">金额</td>
+                                    <td>
+                                        <input type="text" name="money" id="money" lay-verify="required"  autocomplete="off" class="layui-input df_item" style="width:200px">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>转出商户</td>
+                                    <td>
+                                        <input type="text" name="fromUsername" id="fromUsername" lay-verify="required"  autocomplete="off" class="layui-input df_item" style="width:200px">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>安全码(<span style="color: red;font-weight: 600;">转出商户</span>)</td>
+                                    <td>
+                                        <input type="text" name="google_code" lay-verify="required" autocomplete="off" placeholder="请输入谷歌安全码" class="layui-input" value="" style="width:200px">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>目标商户</td>
+                                    <td>
+                                        <input type="text" name="toUsername" id="toUsername" lay-verify="required"  autocomplete="off" class="layui-input df_item" style="width:200px">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>安全码(<span style="color: red;font-weight: 600;">目标商户</span>)</td>
+                                    <td>
+                                        <input type="text" name="google_code2" lay-verify="required" autocomplete="off" placeholder="请输入谷歌安全码" class="layui-input" value="" style="width:200px">
+                                    </td>
+                                </tr>
+    
+                            </thead>
+                        </table>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit="" lay-filter="save">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<include file="Public/footer"/>
+<script>
+    var issubmit=false;
+    layui.use(['form', 'layer','element'], function(){
+        var layer = layui.layer //弹层
+            ,form = layui.form
+            ,element = layui.element; //元素操作
+
+        //监听提交
+        form.on('submit(save)', function(data){
+            var a_num =0;
+            var currency ='<{$currency}>';
+            layer.confirm('请确认目标用户及金额', {
+                btn: ['确定','取消'] //按钮
+            }, function(){
+                a_num+=1;
+                if(a_num == 1) {//控制点击次数，防止重复提交
+                    $.ajax({
+                        url:"<{:U('Account/b2Btransfer2')}>",
+                        type:"post",
+                        data:$('#df_form').serialize(),
+                        success:function(res){
+                            if(res.status){
+                                layer.alert("申请成功", {icon: 6},function () {
+                                    location.reload();
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    parent.layer.close(index);
+                                });
+                            }else{
+                                layer.alert(res.msg ? res.msg : "申请失败", {icon: 5},function () {
+                                    location.reload();
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    parent.layer.close(index);
+                                });
+                            }
+                        }
+                    });
+                }
+            }, function(){
+
+            });
+
+            return false;
+        });
+        form.on('radio(auth_type)',function(data){
+            if(data.value == 1) {
+                $('#auth_google').show();
+                $('#auth_sms').hide();
+            } else {
+                $('#auth_google').hide();
+                $('#auth_sms').show();
+            }
+        });
+    });
+</script>
+</body>
+</html>

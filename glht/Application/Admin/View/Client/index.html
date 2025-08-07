@@ -1,0 +1,187 @@
+<include file="Public/header"/>
+<div class="row">
+    <div class="col-md-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>客户端设备</h5>
+                <div class="row">
+                    <div class="col-sm-2 pull-right">
+                        共 <{$count}> 条数据&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="javascript:;" class="layui-btn layui-btn-small" onclick="admin_add('修改可提额','<{:U('Client/change')}>',540,440)">修改可提额</a>
+                    </div>
+                </div>
+                <div class="ibox-tools col-sm-3 pull-left" style="font-size: 16px;">
+                    刷新：
+                    <i class="layui-icon" onclick="shua_start();" style="cursor:pointer;color: #649bfb;font-size: 14px;">启动</i>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="layui-icon" onclick="shua_end();" style="cursor:pointer;color: #649bfb;font-size: 14px;">关闭</i>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="layui-icon" onclick="shua();" style="cursor:pointer;color: #5874c8;font-size: 14px;">手动</i>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="layui-icon" id="shua_times" style="color: red;font-size: 24px;"></i>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <!--管理员列表-->
+                <div class="layui-field-box">
+                    <table class="layui-table">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>客户端名称</th>
+                            <th>在线情况</th>
+                            <th>今日完成总额</th>
+                            <th>可提取额度</th>
+                            <th></th>
+                            <th>id</th>
+                            <th>客户端名称</th>
+                            <th>在线情况</th>
+                            <th>今日完成总额</th>
+                            <th>可提取额度</th>
+                            <th></th>
+                            <th>id</th>
+                            <th>客户端名称</th>
+                            <th>在线情况</th>
+                            <th>今日完成总额</th>
+                            <th>可提取额度</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <volist name="list" id="v" k="key">
+                            <if condition="$key %3 eq 0">
+                                <tr>
+                                    <?php $k1 = $key; $k2 = $key+1; $k3 = $key+2?>
+                                    <if condition="$list[$k1][title] neq ''">
+                                        <td><{$k1+1}></td>
+                                        <td><{$list.$k1.title}></td>
+                                        <td><if condition="$list[$k1]['online'] neq ''">在线<else/><strong style="color: red;">不在线</strong></if></td>
+                                        <td><{$list.$k1.day_amount}></td>
+                                        <td><{$list.$k1.money}></td>
+                                        <td style="background-color: #f2f2f2;"></td>
+                                    </if>
+                                    <if condition="$list[$k2][title] neq ''">
+                                        <td><{$k2+1}></td>
+                                        <td><{$list.$k2.title}></td>
+                                        <td><if condition="$list[$k2]['online'] neq ''">在线<else/><strong style="color: red;">不在线</strong></if></td>
+                                        <td><{$list.$k2.day_amount}></td>
+                                        <td><{$list.$k2.money}></td>
+                                        <td style="background-color: #f2f2f2;"></td>
+                                    </if>
+                                    <if condition="$list[$k3][title] neq ''">
+                                        <td><{$k3+1}></td>
+                                        <td><{$list.$k3.title}></td>
+                                        <td><if condition="$list[$k3]['online'] neq ''">在线<else/><strong style="color: red;">不在线</strong></if></td>
+                                        <td><{$list.$k3.day_amount}></td>
+                                        <td><{$list.$k3.money}></td>
+                                    </if>
+                                <if condition="$key %3 eq 0">
+                                    </tr>
+                                    <tr>
+                                </if>
+                                </tr>
+                            </if>
+                        </volist>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<include file="Public/footer"/>
+<script>
+    layui.use(['laypage', 'layer', 'form'], function () {
+        var laypage = layui.laypage,
+            $ = layui.jquery;
+    });
+
+    /*管理员-添加*/
+    function admin_add(title, url, w, h) {
+        x_admin_show(title, url, w, h);
+    }
+    /*管理员-编辑*/
+    function admin_edit(title, url, w, h) {
+        x_admin_show(title, url, w, h);
+    }
+    /*管理员-删除*/
+    function admin_del(obj, id) {
+        layer.confirm('确认要删除吗？', function (index) {
+            $.ajax({
+                url: "<{:U('JavaHT/deleteclient')}>",
+                type: 'post',
+                data: 'id=' + id,
+                success: function (res) {
+                    if (res.status) {
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!', {icon: 1, time: 1000});
+                    }
+                }
+            });
+        });
+    }
+    function shua() {
+        layer.confirm('手动刷新页面', function (index) {
+            location.replace(location.href);
+        });
+    }
+    function shua_start() {
+        layer.confirm('确认启动自动刷新', function (index) {
+            document.cookie = "start=1";
+            location.replace(location.href);
+        });
+    }
+    function shua_end() {
+        layer.confirm('确认关闭自动刷新', function (index) {
+            delCookie("start");
+            location.replace(location.href);
+        });
+    }
+    function admin_show(title, url, w, h) {
+        x_admin_show(title, url, w, h);
+    }
+
+    var intDiff = parseInt('15');//倒计时总秒数量
+    $(function () {
+        var start = getCookie('start');
+        if (start == 1) {
+            timer(intDiff);
+            setTimeout("location=location; ", intDiff * 1000);
+        }
+    });
+    function timer(intDiff) {
+        window.setInterval(function () {
+            var day = 0,
+                hour = 0,
+                minute = 0,
+                second = 0;//时间默认值
+            if (intDiff > 0) {
+                day = Math.floor(intDiff / (60 * 60 * 24));
+                hour = Math.floor(intDiff / (60 * 60)) - (day * 24);
+                minute = Math.floor(intDiff / 60) - (day * 24 * 60) - (hour * 60);
+                second = Math.floor(intDiff) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+                intDiff--;
+                if (minute <= 9) minute = '0' + minute;
+                if (second <= 9) second = '0' + second;
+                $('#shua_times').attr('title', second + ' 秒');
+                $('#shua_times').html(second + ' 秒');
+            } else {
+                $('#shua_times').attr('title', '刷新页面当中');
+                $('#shua_times').html('刷新页面当中');
+            }
+        }, 1000);
+    }
+
+    function getCookie(name) {
+        var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+        if (arr = document.cookie.match(reg))
+            return unescape(arr[2]);
+        else
+            return null;
+    }
+    function delCookie(name) {
+        var exp = new Date();
+        exp.setTime(exp.getTime() - 1);
+        var cval = getCookie(name);
+        if (cval != null)
+            document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+    }
+</script>
+</body>
+</html>

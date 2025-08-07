@@ -1,0 +1,88 @@
+<include file="Public/header"/>
+<style type="text/css">
+  .layui-table-cell {
+    height: inherit!important;
+  }
+</style>
+<body id="iosiframe">
+<div class="row">
+  <div class="col-md-12">
+    <div class="ibox float-e-margins">
+      <!--条件查询-->
+      <div class="ibox-title" style="height: 75px;">
+        <h5 style="height: 35px;">下载列表</h5>
+      </div>
+      <!--条件查询-->
+      <!--<div class="ibox-content">-->
+      <!--  <form class="layui-form layui-form-pane form-search" action="" method="get" autocomplete="off" id="orderform">-->
+          
+      <!--    <div class="layui-form-item layui-inline">-->
+      <!--      <label class="layui-form-label">创建时间</label>-->
+      <!--      <div class="layui-input-inline">-->
+      <!--        <input type="text" class="layui-input" name="createtime" id="createtime"-->
+      <!--               placeholder="创建起始时间" value="<{$createtime|htmlspecialchars}>" autocomplete="off">-->
+      <!--      </div>-->
+      <!--    </div>-->
+          
+      <!--    <div class="layui-form-item layui-inline">-->
+      <!--      <button type="submit" class="layui-btn"><span class="glyphicon glyphicon-search"></span> 搜索 </button>-->
+      <!--    </div>-->
+      <!--  </form>-->
+      <!--</div>-->
+      <div class="list item">
+        <!--交易列表-->
+        <table class="layui-table" lay-skin="line" lay-size="sm" lay-data="{width:'100%',limit:<{$rows}>,id:'userData'}">
+          <thead>
+          <tr>
+            <th lay-data="{field:'key',width:80, align:'center'}">ID</th>
+            <th lay-data="{field:'name', width:150, align:'center'}">下载内容</th>
+            <th lay-data="{field:'type',width:150, align:'center'}">类型</th>
+            <!--<th lay-data="{field:'down_url',width:250, align:'center'}">路径</th>-->
+            <th lay-data="{field:'where',width:400, align:'center'}">条件</th>
+            <th lay-data="{field:'time', width:150, align:'center'}">下载时间</th>
+            <th lay-data="{field:'op',width:150, align:'center'}">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <volist name="list" id="vo" key="key">
+            <tr>
+                <td><{$key}></td>
+                <td><{$vo.name}></td>
+                <td><{$vo.type|downType=###}></td>
+                <!--<td><{$vo.down_url}></td>-->
+                <td><if condition="$vo.where !='' "><{$vo.where|http_build_query|urldecode}><else/>无</if></td>
+                <td><{$vo.time|date='Y-m-d H:i:s',###}></td>
+              <td>
+                <if condition="$vo['status'] neq 1">
+                    <span style="color:#23c6c8;">导出中，请等待...</span>
+                </if>
+                <if condition="$vo['status'] eq 1 && $vo.url eq 'noData'">
+                    <span style="color:#23c6c8;">导出失败，请重新导出</span>
+                </if>
+                <if condition="$vo['status'] eq 1 && $vo.url neq 'noData'">
+                    <a class="layui-btn layui-btn-warm layui-btn-small" href="<{$vo.url}>">下载</a>
+                </if>
+              </td>
+            </tr>
+          </volist>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+<include file="Public/footer"/>
+
+<script>
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'form'], function() {
+        var laydate = layui.laydate //日期
+            , laypage = layui.laypage //分页
+            ,layer = layui.layer //弹层
+            ,form = layui.form //表单
+            , table = layui.table; //表格
+    });
+
+</script>
+</body>
+</html>

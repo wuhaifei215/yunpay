@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <title>收银台</title>
+    <link rel="stylesheet" type="text/css" href="/Public/Alips/css/qrcode.css">
+    <script type="text/javascript" src="/Public/Alips/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/Public/Alips/js/qrcode.js"></script>
+    <script type="text/javascript" src="/Public/Alips/js/layer.js"></script>
+    <script type="text/javascript" src="/Public/Alips/js/qqapi.js"></script>
+</head>
+<body>
+<div style="width: 100%; text-align: center;font-family:微软雅黑;">
+    <div id="panelWrap" class="panel-wrap">
+        <!-- PANEL TlogoEMPLATE START -->
+        <div class="panel panel-easypay">
+            <!-- PANEL HEADER -->
+            <div class="qrcode-warp">
+                <div id="qrcode">
+                    <img id="qrcode_load" src="/Public/Alips/picture/loading.gif" style="display: block;">
+                </div>
+            </div>
+            <div class="panel-footer">
+                <font style="font-size:20px;">正在生成二维码，请耐心等待！</font>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type: 'POST',
+            url: '<{$RePayUrl}>',
+            data: {
+                data:"<{$data}>",
+            },
+            dataType: 'json',
+            success: function (result) {
+                if (result.code == '100') {
+                    window.location.href = "" + result.msg;
+                }
+                if (result.code == '200') {
+                    $("#panelWrap").remove();
+                    document.write(result.msg);
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

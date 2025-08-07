@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="renderer" content="webkit">
+<title><{:C("WEB_TITLE")}></title>
+<link rel="shortcut icon" href="favicon.ico">
+<link href="/Public/Front/css/bootstrap.min.css" rel="stylesheet">
+<link href="/Public/Front/css/font-awesome.min.css" rel="stylesheet">
+<link href="/Public/Front/css/animate.css" rel="stylesheet">
+<link href="/Public/Front/css/style.css" rel="stylesheet">
+<link href="/Public/Front/js/plugins/fancybox/jquery.fancybox.css" rel="stylesheet">
+<link rel="stylesheet" href="/Public/Front/js/plugins/layui/css/layui.css">
+<style>
+	.layui-form-switch {width:54px;}
+	.layui-form-label {width:110px;padding:4px}
+</style>
+<body>
+    <div class="wrapper wrapper-content animated">
+        <div class="row">
+            <div class="col-sm-12">
+			<form class="layui-form" action="" id="userProduct">
+				<input type="hidden" name="agency_id" value="<{$_GET['uid']|htmlspecialchars}>">
+
+				<table class="layui-table" lay-even="" lay-skin="line" style="margin-top:30px;" id="table">
+			        <thead>
+    				<tr>
+    				  <th>选择用户</th>
+    				  <th><a href="javascript:;" id="checkAll" class="layui-btn layui-btn-sm">全选</a><a href="javascript:;" id="unCheckAll" class="layui-btn layui-btn-sm">全不选</a></th>
+    				</tr> 
+    				</thead>
+    				<tbody>
+    				    <volist name="userList" id="vo" key="k">
+        				    <if condition="$k%2 eq 1"><tr></if>
+            				    <td>
+            				        <input type="checkbox" <if condition="$vo[agency_id] eq $_GET[uid]">checked</if> value="<{$vo.id}>" class='checkIds' lay-skin="primary"> &nbsp; <{$vo['id']|shanghubianhao=###}> == <{$vo.username}>
+        				        </td>
+        				    <if condition="$k%2 eq 0"></tr></if>
+    				    </volist>
+				    </tbody>
+				</table>
+				<!--产品列表-->
+				<div class="layui-form-item">
+					<div class="layui-input-block">
+					  <button class="layui-btn" lay-submit="submit" lay-filter="save">提交保存</button>
+					</div>
+				</div>
+			</form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/Public/Front/js/jquery.min.js"></script>
+    <script src="/Public/Front/js/bootstrap.min.js"></script>
+    <script src="/Public/Front/js/plugins/peity/jquery.peity.min.js"></script>
+    <script src="/Public/Front/js/content.js"></script>
+	<script src="/Public/Front/js/plugins/layui/layui.js" charset="utf-8"></script>
+<include file="Public/footer"/>
+
+<script>
+
+    // 用户-编辑
+    function member_edit(title, url, id, w, h) {
+        x_admin_show(title, url, w, h);
+    }
+    
+    $('#checkAll').on('click', function(){
+        var child = $('table').next().find('tbody input[type="checkbox"]');  ;
+        child.each(function(){
+            $(this).attr('checked', true);
+        });
+        $('.layui-form-checkbox').addClass('layui-form-checked');
+
+    });
+    $('#unCheckAll').on('click', function(){
+        var child = $('table').next().find('tbody input[type="checkbox"]');  ;
+        child.each(function(){
+            $(this).attr('checked', false);
+        });
+        $('.layui-form-checkbox').removeClass('layui-form-checked');
+
+    });
+    
+    
+  layui.use(['layer', 'form','laydate'], function(){
+  var form = layui.form
+  ,laydate = layui.laydate
+  ,layer = layui.layer;
+  //监听提交
+  form.on('submit(save)', function(data){
+    var id = '';
+
+    $('.checkIds').each(function () {
+        var _this = $(this);
+        if (_this.is(':checked')) {
+            id = id + _this.val() + ',';
+        }
+    });
+    if(id ==''){
+        layer.msg('请选择用户', {icon: 2, time: 2000});
+        return false;
+    }
+    
+    if (id!='') {
+        $.ajax({
+    		url:"<{:U('Agency/saveUserAgency')}>",
+    		type:"post",
+    		data:{'ids': id, 'agency_id': "<{$_GET['uid']}>"},
+    		success:function(res){
+    			if(res.status){
+    				layer.alert("编辑成功", {icon: 6},function () {
+    					parent.location.reload();
+    					var index = parent.layer.getFrameIndex(window.name);
+    					parent.layer.close(index);
+    				});
+    			}else{
+                    layer.alert("操作失败", {icon: 5},function () {
+                        parent.location.reload();
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    });
+    			}
+    		}
+    	});
+    }
+    return false;
+  });
+});
+</script>
+<!--统计代码，可删除-->
+</body>
+</html>

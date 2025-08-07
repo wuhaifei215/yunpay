@@ -1,0 +1,228 @@
+<include file="Public/header"/>
+<style type="text/css">
+    .layui-form-label{width:120px;}
+    .layui-form-select dl { max-height:500px; }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex m-b-10 no-block">
+                        <h5 class="card-title m-b-0 align-self-center">
+                            <eq name="currency" value="PHP">
+                            USDT下发申请(1) 
+                            </eq>
+                            <eq name="currency" value="INR">
+                            USDT下发申请(2) 
+                            </eq>
+                            <span class="text-danger"></span>
+                        </h5>
+                    </div>
+                    <div class="table-responsive m-t-10">
+    				<div class="layui-tab">
+    				</div>
+                    <blockquote class="layui-elem-quote">
+                        <eq name="currency" value="PHP">
+                            <span class="text-danger">可提现：<{$info['balance_php']}> </span>
+                            <span style="margin:0 30px;" class="text-muted">冻结：<{$info['blockedbalance_php']}> </span>
+                        </eq>
+                        <eq name="currency" value="INR">
+                            <span class="text-danger">可提现：<{$info['balance_inr']}> </span>
+                            <span style="margin:0 30px;" class="text-muted">冻结：<{$info['blockedbalance_inr']}> </span>
+                        </eq>
+                    </blockquote>
+                    <!--<div class="layui-inline">-->
+                    <!--    <button type="button" class="layui-btn" onclick="addRow()">-->
+                    <!--        <span class="glyphicon glyphicon-plus"> 新增</span>-->
+                    <!--    </button>-->
+                    <!--</div>-->
+                    </div>
+                    <form class="layui-form layui-table-body" id="df_form" style="min-height: 550px;">
+                    
+                    <table class="layui-table">
+                            <thead id="container">
+                                <tr>
+                                    <td style="width:120px;fload:right;">提现金额</td>
+                                    <td>
+                                        <input type="text" name="item[1][tkmoney]" id="tkmoney" lay-verify="required"  autocomplete="off" class="layui-input df_item" style="width:150px">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>汇率</td>
+                                    <td>
+                                        <input type="text" name="item[1][sxfmoney]" id="sxfmoney" lay-verify="required"  autocomplete="off" class="layui-input df_item" style="width:150px">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>转换后金额</td>
+                                    <td>
+                                        <input type="text" name="item[1][money]" id="money" lay-verify="required"  autocomplete="off" class="layui-input df_item" style="width:150px" readonly>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>地址</td>
+                                    <td>
+                                        <input type="text" name="item[1][cardnumber]" id="cardnumber" lay-verify="required"  autocomplete="off" class="layui-input df_item" style="width:350px">
+                                    </td>
+                                </tr>
+    
+                            </thead>
+                        </table>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">支付密码：</label>
+                            <div class="layui-input-inline">
+                                <input type="password" name="password" lay-verify="required" placeholder="请输入支付密码" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                         <if condition="$verifyGoogle and $verifysms">
+                            <div class="layui-form-item" id="df_auto_check">
+                                <label class="layui-form-label">验证方式：</label>
+                                <div class="layui-input-block">
+                                    <input type="radio" name="auth_type" lay-filter="auth_type" value="1" title="谷歌安全码" checked>
+                                    <input type="radio" name="auth_type" lay-filter="auth_type" value="0" title="短信验证码">
+                                </div>
+                            </div>
+                            <else />
+                            <input type="hidden" name="auth_type" value="<{$auth_type}>">
+                        </if>
+                        <eq name="verifyGoogle" value="1">
+                            <div class="layui-form-item" id="auth_google">
+                                <label class="layui-form-label">谷歌安全码：</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="google_code" autocomplete="off"
+                                           placeholder="请输入谷歌安全码" class="layui-input" value="">
+                                </div>
+                            </div>
+                        </eq>
+                        <eq name="verifysms" value="1">
+                            <div id="auth_sms" <if condition="$verifyGoogle and $verifysms">style="display: none"</if>>
+                            <include file="Public/send"/>
+                            </div>
+                        </eq>
+    
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit="" lay-filter="save">提交申请</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<include file="Public/footer"/>
+<script>
+    $(document).ready(function() {
+        $('#sxfmoney').on('input', function() {
+            var tkmoney = $('#tkmoney').val();
+            var sxfmoney = $('#sxfmoney').val()
+            if(!tkmoney || tkmoney==0){
+               layer.alert( "请先输入正确的提现金额", {icon: 5});
+               return;
+            }
+            var money = parseFloat(tkmoney/sxfmoney).toFixed(2);
+            $('#money').val(money);
+        });
+    });
+    var rowCount=1;
+    //添加行
+    function addRow(){
+        rowCount++;
+        var newRow='<tr id="option'+rowCount+'">' + '<td>'+rowCount+'</td> <td>'+
+            '<input type="text" name="item['+rowCount+'][tkmoney]" lay-verify="required"  autocomplete="off" class="layui-input df_item" style="width:150px"></td><td>' + '<input type="text" name="item['+rowCount+'][cardnumber]" lay-verify="required"  autocomplete="off" class="layui-input df_item" style="width:350px"></td>';
+        newRow+='<td>';
+        newRow+=' <button class="layui-btn layui-btn-danger layui-btn-small"  onclick="$(this).parent().parent().remove();">删除</button></td></tr>';
+        $('#container').append(newRow);
+        layui.form.render();
+    }
+    var issubmit=false;
+    layui.use(['form', 'layer','element'], function(){
+        var layer = layui.layer //弹层
+            ,form = layui.form
+            ,element = layui.element; //元素操作
+
+        //监听提交
+        form.on('submit(save)', function(data){
+            var a_num =0;
+            var currency ='<{$currency}>';
+            // layer.confirm('请确认代付类型是否正确', {
+            //     btn: ['确定','取消'] //按钮
+            // }, function(){
+                a_num+=1;
+                if(a_num == 1) {//控制点击次数，防止重复提交
+                    // var flag = false;
+                    // $('.df_item').each(function(){
+                    //     if($(this).val() == '') {
+                    //         flag = true;
+                    //         return false;
+                    //     }
+                    // });
+                    // if(flag == true) {
+                    //     layer.alert('表格存在空值，请检查后再提交！');
+                    //     return false;
+                    // }
+                    if(currency==='PHP'){
+                        $.ajax({
+                            url:"<{:U('Withdrawal/dfsaveUphp')}>",
+                            type:"post",
+                            data:$('#df_form').serialize(),
+                            success:function(res){
+                                if(res.status){
+                                    layer.alert("申请成功", {icon: 6},function () {
+                                        location.reload();
+                                        var index = parent.layer.getFrameIndex(window.name);
+                                        parent.layer.close(index);
+                                    });
+                                }else{
+                                    layer.alert(res.info ? res.info : "申请失败", {icon: 5},function () {
+                                        location.reload();
+                                        var index = parent.layer.getFrameIndex(window.name);
+                                        parent.layer.close(index);
+                                    });
+                                }
+                            }
+                        });
+                    }else{
+                        $.ajax({
+                            url:"<{:U('Withdrawal/dfsaveUinr')}>",
+                            type:"post",
+                            data:$('#df_form').serialize(),
+                            success:function(res){
+                                if(res.status){
+                                    layer.alert("申请成功", {icon: 6},function () {
+                                        location.reload();
+                                        var index = parent.layer.getFrameIndex(window.name);
+                                        parent.layer.close(index);
+                                    });
+                                }else{
+                                    layer.alert(res.info ? res.info : "申请失败", {icon: 5},function () {
+                                        location.reload();
+                                        var index = parent.layer.getFrameIndex(window.name);
+                                        parent.layer.close(index);
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            // }, function(){
+
+            // });
+
+            return false;
+        });
+        form.on('radio(auth_type)',function(data){
+            if(data.value == 1) {
+                $('#auth_google').show();
+                $('#auth_sms').hide();
+            } else {
+                $('#auth_google').hide();
+                $('#auth_sms').show();
+            }
+        });
+    });
+</script>
+</body>
+</html>

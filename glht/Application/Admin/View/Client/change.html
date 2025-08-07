@@ -1,0 +1,86 @@
+<include file="Public/header"/>
+<div class="row">
+    <div class="col-md-12">
+        <form class="layui-form" id="editForm">
+            <div class="layui-form-item">
+                <label class="layui-form-label">客户端：</label>
+                <div class="layui-input-inline">
+                  <select name="userid" lay-verify="required" lay-search="">
+                    <option value=""></option>
+                    <volist name="channel_account" id="g">
+                      <option value="<{$g.mch_id}>_<{$g.title}>"><{$g.title}></option>
+                    </volist>
+                  </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">操作方式：</label>
+                <div class="layui-input-inline">
+                    <input type="radio" name="change_type" lay-verify="required" value="1" title="减少" checked>
+                    <input type="radio" name="change_type" lay-verify="required" value="2" title="增加">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">变动金额：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="change_money" lay-verify="required" placeholder="请输入变动金额" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <label style="color: red;">请再次确认 (客户端) (操作) 及 (变动金额) 再进行提交</label>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="user">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<include file="Public/footer"/>
+<script>
+    layui.use(['laydate', 'layer', 'form'], function () {
+        var $ = layui.jquery,
+            form = layui.form
+            , laydate = layui.laydate //日期
+            , layer = layui.layer;
+
+        //日期时间范围
+        laydate.render({
+            elem: '#expiredate'
+            , type: 'datetime'
+        });
+
+        $("button[type=reset]").click();
+        //监听提交
+        form.on('submit(user)', function (data) {
+            $.ajax({
+                url: "<{:U('Client/change')}>",
+                type: "post",
+                data: $('#editForm').serialize(),
+                success: function (res) {
+                    if (res.status) {
+                        layer.alert("操作成功", {icon: 6}, function () {
+                            parent.location.reload();
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        });
+                    } else {
+
+                        layer.msg(res.msg ? res.msg : "操作失败!", {icon: 5}, function () {
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        });
+                        return false;
+                    }
+                }
+            });
+            return false;//阻止表单跳转
+        });
+    });
+</script>
+</body>
+</html>

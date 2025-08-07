@@ -1,0 +1,124 @@
+<include file="Public/header"/>
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+<div class="row">
+    <div class="col-md-12">
+        <div class="ibox-title">
+            <h5>提款新消息提醒</h5>
+
+        </div>
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <div class="ibox-tools col-sm-3 pull-left" style="font-size: 16px;">
+                    刷新：
+                    <i class="layui-icon" onclick="shua_start();" style="cursor:pointer;color: #649bfb;font-size: 14px;">启动</i>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="layui-icon" onclick="shua_end();" style="cursor:pointer;color: #649bfb;font-size: 14px;">关闭</i>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="layui-icon" onclick="shua();"  style="cursor:pointer;color: #5874c8;font-size: 14px;">手动</i>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="layui-icon" id="shua_times" style="color: red;font-size: 24px;"></i>
+                </div>
+                <div class="pull-right" style="font-size: 16px;">
+                    <button onclick="playVoice();" style="font-size: 14px;width: 80px;height: 28px;line-height: 18px;"> 测试播放 </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<include file="Public/footer"/>
+<script>
+    getlist();
+    function getlist() {
+        $.ajax({
+            url: "",
+            type: 'post',
+            data: 'id=1',
+            success: function (res) {
+                if (res.status == 1) {
+                    playVoice();
+                }
+            }
+        });
+    }
+
+    function playVoice() {
+        var borswer = window.navigator.userAgent.toLowerCase();
+        if (borswer.indexOf("ie") >= 0) {
+            //IE内核浏览器
+            var strEmbed = '<embed name="embedPlay" src="call.mp3" autostart="true" hidden="true" loop="false"></embed>';
+            if ($("body").find("embed").length <= 0) {
+                $("body").append(strEmbed);
+            }
+            var embed = document.embedPlay;
+            //浏览器不支持 audio，则使用 embed 播放
+            embed.volume = 100;
+        } else {
+            console.log('放');
+            //非IE内核浏览器
+            var strAudio = "<audio id='audioPlay' src='call.mp3' hidden='true'>";
+            if ($("body").find("audio").length <= 0) {
+                $("body").append(strAudio);
+            }
+            var audio = document.getElementById("audioPlay");
+            //浏览器支持 audio
+            audio.play();
+        }
+    }
+
+    function shua() {
+        location.replace(location.href);
+    }
+    function shua_start() {
+        document.cookie = "start=1";
+        location.replace(location.href);
+    }
+    function shua_end() {
+        delCookie("start");
+        location.replace(location.href);
+    }
+
+    var intDiff = parseInt('10');//倒计时总秒数量
+    $(function () {
+        var start = getCookie('start');
+        if (start == 1) {
+            timer(intDiff);
+            setTimeout("location=location; ", intDiff * 1000);
+        }
+    });
+    function timer(intDiff) {
+        window.setInterval(function () {
+            var day = 0,
+                hour = 0,
+                minute = 0,
+                second = 0;//时间默认值
+            if (intDiff > 0) {
+                day = Math.floor(intDiff / (60 * 60 * 24));
+                hour = Math.floor(intDiff / (60 * 60)) - (day * 24);
+                minute = Math.floor(intDiff / 60) - (day * 24 * 60) - (hour * 60);
+                second = Math.floor(intDiff) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+                intDiff--;
+                if (minute <= 9) minute = '0' + minute;
+                if (second <= 9) second = '0' + second;
+                $('#shua_times').attr('title', second + ' 秒');
+                $('#shua_times').html(second + ' 秒');
+            } else {
+                $('#shua_times').attr('title', '刷新页面当中');
+                $('#shua_times').html('刷新页面当中');
+            }
+        }, 1000);
+    }
+
+    function getCookie(name) {
+        var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+        if (arr = document.cookie.match(reg))
+            return unescape(arr[2]);
+        else
+            return null;
+    }
+    function delCookie(name) {
+        var exp = new Date();
+        exp.setTime(exp.getTime() - 1);
+        var cval = getCookie(name);
+        if (cval != null)
+            document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+    }
+</script>
+</body>
+</html>

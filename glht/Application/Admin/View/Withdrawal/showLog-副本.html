@@ -1,0 +1,59 @@
+<include file="Public/header"/>
+<style type="text/css">
+.msg tr td {
+  max-width: 600px;
+  white-space: scroll;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+}
+</style>
+
+      <div class="ibox-content">
+        <table class="layui-table msg">
+            <volist name="order.getOperLog" id="vo">
+                <tr><td>模块标题：</td><td><strong class="text-danger"><{$vo.title}></strong></td></tr>
+                <tr><td>系统订单号：</td><td><strong class="text-success"><{$vo.order_id}></strong></td></tr>
+                <tr><td>商户订单号：</td><td><strong class="text-success"><{$vo.out_trade_id}></strong></td></tr>
+                <tr><td>业务类型（0其它 1下单 2回调）：</td><td><strong class="text-success"><{$vo.business_type}></strong></td></tr>
+                <tr><td>请求URL：</td><td><strong class="text-success"><{$vo.oper_url}></strong></td></tr>
+                <tr><td>请求参数：</td><td><strong class="text-success"><{$vo.oper_param}></strong></td></tr>
+                <tr><td>返回参数：</td><td><strong class="text-success"><{$vo.json_result}></strong></td></tr>
+                <tr><td>操作状态（0正常 1异常）：</td><td><strong class="text-success"><{$vo.status}></strong></td></tr>
+                <tr><td>消耗时间(ms)：</td><td><strong class="text-success"><{$vo.cost_time}></strong></td></tr>
+                <tr><td>错误消息：</td><td><strong class="text-success"><{$vo.error_msg}></strong></td></tr>
+                <tr><td>创建时间：</td><td><strong class="text-success"><{$vo.create_time}></strong></td></tr> 
+                <!--<tr><td>方法名称：</td><td><strong class="text-success"><{$vo.method}></strong></td></tr>-->
+                <tr><td>请求方式：</td><td><strong class="text-success"><{$vo.request_method}></strong></td></tr>
+                <tr><td>操作类别（0其它 1后台 2Api）：</td><td><strong class="text-success"><{$vo.operator_type}></strong></td></tr>
+                
+                <tr style="background:#5874c8;">
+                    <td></td><td></td>
+                </tr>
+            </volist>
+            <volist name="order.getNotifyLog" id="vo">
+                <tr><td>模块标题：</td><td><strong class="text-danger">三方异步回调信息</strong></td></tr>
+                <tr><td>系统订单号：</td><td><strong class="text-success"><{$vo.order_id}></strong></td></tr>
+                <!--<tr><td>商户订单号：</td><td><strong class="text-success"><{$vo.out_trade_id}></strong></td></tr>-->
+                <tr><td>回调参数：</td><td><strong class="text-success"><{$vo.oper_param}></strong></td></tr>
+                <tr><td>返回信息：</td><td><strong class="text-success"><{$vo.json_result}></strong></td></tr>
+                <tr><td>创建时间：</td><td><strong class="text-success"><{$vo.create_time}></strong></td></tr>
+                <tr><td>业务类型（0入款 1出款）：</td><td><strong class="text-success"><{$vo.type}></strong></td></tr>
+                
+                <tr style="background:#5874c8;">
+                    <td></td><td></td>
+                </tr>
+            </volist>
+
+        </table>
+      </div>
+<include file="Public/footer"/>
+<script>
+layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element'], function() {
+        var laydate = layui.laydate //日期
+            , laypage = layui.laypage //分页
+            ,layer = layui.layer //弹层
+            , table = layui.table; //表格
+    });
+</script>
+</body>
+</html>

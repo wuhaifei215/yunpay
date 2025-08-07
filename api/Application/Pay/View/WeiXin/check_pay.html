@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<style>
+    button{
+        font-size:35px;
+        margin:20px auto;
+        padding:5px;
+    }
+</style>
+<body style="background-color: #ecedf2;width:100%;font-size:35px;">
+    <div style="background-color:#fff;margin-top: 15px;padding: 30px;text-align: center;display: none;" id="ewm">
+        <div>
+            请点击复制下面地址
+        </div>
+        <div>
+            使用<font style="color:#F60;">微信</font>或者<font style="color:#F60;">支付宝</font>APP打开
+        </div>
+        <div>
+            <div id="IosCode"><{$qr_url}></span>
+            <input id="AppCode" type="text" readonly value="<{$qr_url}>" style="position: absolute;opacity: 0">
+        </div>
+        <div>
+            <button onclick="CopyText('IosCode','AppCode')">点击复制</button>
+        </div>
+        <div>
+            <button onclick="openAlipay();">打开支付宝</button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <button onclick="openWX();">打开微信</button>
+        </div>
+    </div>
+    <script src="<{$siteurl}>Public/Front/js/jquery.min.js"></script>
+    <script>
+        window.onload = function () {
+            if(is_weixin() || is_alipay()){
+                var Url2 = document.getElementById('IosCode').innerText;
+                window.location.href = Url2;
+            }else{
+                console.log(22222);
+                $("#ewm").show();
+            }
+        }
+        function is_weixin(){
+            var ua = navigator.userAgent.toLowerCase();
+            if(ua.match(/MicroMessenger/i)=="micromessenger") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function is_alipay(){
+            var ua = navigator.userAgent.toLowerCase();
+            if(ua.match(/Alipay/i)=="alipay") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+    
+        function CopyText (ios,app) {
+            if(window.plus){
+                var text = document.getElementById(ios).innerText;
+                switch ( plus.os.name ) {
+                    case "Android":
+                        var Context = plus.android.importClass("android.content.Context");
+                        var main = plus.android.runtimeMainActivity();
+                        var clip = main.getSystemService(Context.CLIPBOARD_SERVICE);
+                        plus.android.invoke(clip,"setText",text);
+                        break;
+                    case "iOS":
+                        var UIPasteboard  = plus.ios.importClass("UIPasteboard");
+                        var generalPasteboard = UIPasteboard.generalPasteboard();
+                        // 设置/获取文本内容:
+                        generalPasteboard.setValueforPasteboardType(text, "public.utf8-plain-text");
+                        var value = generalPasteboard.valueForPasteboardType("public.utf8-plain-text");
+                        break;
+                }
+                alert('Copy succeeded')
+            }else{
+                if (navigator.userAgent.match(/(iPhone|iPod|iPad);?/i)) {
+                    window.getSelection().removeAllRanges();
+                    var Url2 = document.getElementById(ios);
+                    var range = document.createRange();
+                    range.selectNode(Url2);
+                    window.getSelection().addRange(range);
+                    var successful = document.execCommand('copy');
+                    if(successful){
+                        alert('Copy succeeded')
+                    }else{
+                        alert('IOS system version is low and not supported')
+                    }
+                    window.getSelection().removeAllRanges();
+                }else{
+                    var Url2=document.getElementById(app);
+                    Url2.select();
+                    document.execCommand("Copy");
+                    alert('Copy succeeded')
+                }
+            }
+        }
+    
+        function openWX(){
+        // 	bindEvent()
+        	//打开微信
+        	window.location = 'weixin://';
+        // 	TIMER = setTimeout(function(){
+        // 		//超时后跳转下载页
+        // 		window.location.href = '';
+        // 	},1000);
+        }
+        function openAlipay(){
+        // 	bindEvent()
+        	//打开微信
+        	window.location = 'alipays://';
+        // 	TIMER = setTimeout(function(){
+        // 		//超时后跳转下载页
+        // 		window.location.href = '';
+        // 	},1000);
+        }
+        
+        //绑定挂起监听
+        function bindEvent() {
+        	var hidden, visibilityChange;
+        	if (typeof document.hidden !== "undefined") {
+        	    hidden = "hidden";
+        	    visibilityChange = "visibilitychange";
+        	} else if (typeof document.msHidden !== "undefined") {
+        	    hidden = "msHidden";
+        	    visibilityChange = "msvisibilitychange";
+        	} else if (typeof document.webkitHidden !== "undefined") {
+        	    hidden = "webkitHidden";
+        	    visibilityChange = "webkitvisibilitychange";
+        	}
+        	$(document).bind(visibilityChange, function () {
+        	    if(document[hidden]) {
+        	    	//监听浏览器挂起时（即调起APP）清除定时
+        	        clearTimeout(TIMER);
+        	    }
+        	});
+        }
+    </script>
+</body>
+</html>

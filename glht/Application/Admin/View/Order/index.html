@@ -1,0 +1,539 @@
+<include file="Public/header"/>
+<style type="text/css">
+  .layui-table-cell {
+    height: inherit!important;
+  }
+ 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none; /* 默认隐藏遮罩 */
+  z-index: 10;
+}
+</style>
+<body id="iosiframe">
+<div class="row">
+    <div class="overlay" id="overlay"></div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="ibox float-e-margins">
+      <!--条件查询-->
+      <div class="ibox-title" style="height: 75px;">
+        <h5 style="height: 35px;">订单管理</h5>
+        <div class="ibox-tools">
+          <div class="layui-form-item layui-inline" style="line-height: 22px; margin: 5px;">
+            <label class="layui-form-label" style="width: 80px;">刷新时间：</label>
+            <div class="layui-input-inline" style="width: 30px;">
+              <input type="text" id="time"  name="time" value="" style=" width: 30px;">
+            </div>
+            <a href="javascript:;"class="layui-btn layui-btn-small" onclick="set_time();" style="color: white">开始</a>
+            <a href="javascript:;"class="layui-btn layui-btn-small" onclick="shua_end();" style="color: white">关闭</a>
+          </div>
+        </div>
+      </div>
+      <!--条件查询-->
+      <div class="ibox-content">
+        <form class="layui-form layui-form-pane form-search" action="" method="get" autocomplete="off" id="orderform">
+          <input type="hidden" name="m" value="<{$model}>">
+          <input type="hidden" name="c" value="Order">
+          <input type="hidden" name="a" value="index" id="action">
+          <input type="hidden" name="p" value="1">
+          <input type="hidden" name="rows" id="rows" value="<{$rows}>">
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">商户编号</label>
+            <div class="layui-input-inline">
+              <input type="text" name="memberid" id="memberid" value="<if condition="$memberid gt 0"><{$memberid|htmlspecialchars}></if>" placeholder="请输入商户号" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">系统订单号</label>
+            <div class="layui-input-inline">
+              <input type="text" name="orderid" value="<{$orderid|htmlspecialchars}>" placeholder="请输入系统订单号" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">外部订单号</label>
+            <div class="layui-input-inline">
+              <input type="text" name="out_trade_id" value="<{$out_trade_id|htmlspecialchars}>" placeholder="请输入外部订单号" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">创建时间</label>
+            <div class="layui-input-inline" style="width:270px;">
+              <input type="text" class="layui-input" name="createtime" id="createtime"
+                     placeholder="创建起始时间" value="<{$createtime|htmlspecialchars}>" autocomplete="off">
+            </div>
+            
+            <a href="javascript:;" class="layui-btn layui-btn-danger week">7天内</a>
+            
+          </div>
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">成功时间</label>
+            <div class="layui-input-inline" style="width:270px;">
+              <input type="text" class="layui-input" name="successtime" id="successtime"
+                     placeholder="成功时间范围" value="<{$successtime|htmlspecialchars}>" autocomplete="off">
+            </div>
+          </div>
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">通道类型</label>
+            <div class="layui-input-inline">
+              <select name="bank">
+                <option value="">全部类型</option>
+                <volist name="banklist" id="vo">
+                  <option <if condition="$bank eq $vo['id']">selected</if>
+                  value="<{$vo.id}>"><{$vo.name}></option>
+                </volist>
+              </select>
+            </div>
+          </div>
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">所属通道</label>
+            <div class="layui-input-inline">
+              <select name="tongdao" lay-filter="channel"  data-child="account">
+                <option value="">全部通道</option>
+                <volist name="tongdaolist" id="vo">
+                  <option <if condition="$tongdao eq $vo['id']">selected</if>
+                  value="<{$vo.id}>"><{$vo.title}></option>
+                </volist>
+              </select>
+            </div>
+          </div>
+          <!--<div class="layui-form-item layui-inline">-->
+          <!--  <label class="layui-form-label">通道子账号</label>-->
+          <!--  <div class="layui-input-inline">-->
+          <!--    <select name="account" lay-filter="channel">-->
+          <!--      <option value="">全部子账号</option>-->
+          <!--      <if condition="$accountlist">-->
+          <!--        <volist name="accountlist" id="vo">-->
+          <!--          <option <if condition="$account eq $vo['id']">selected</if>-->
+          <!--          value="<{$vo.id}>"><{$vo.title}></option>-->
+          <!--        </volist>-->
+          <!--      </if>-->
+          <!--    </select>-->
+          <!--  </div>-->
+          <!--</div>-->
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">订单状态</label>
+            <div class="layui-input-inline">
+              <select name="status">
+                <option value="">全部状态</option>
+                <option <if condition="$status neq '' && $status eq 0">selected</if> value="0">未处理</option>
+                <option <if condition="$status eq 1">selected</if> value="1">成功，未返回</option>
+                <option <if condition="$status eq 2">selected</if> value="2">成功，已返回</option>
+                <option <if condition="$status eq 3">selected</if> value="3">失败</option>
+                <option <if condition="$status eq '1or2'">selected</if> value="1or2">成功，已/未返回</option>
+              </select>
+            </div>
+          </div>
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">订单描述</label>
+            <div class="layui-input-inline">
+              <input type="text" name="body" value="<{$body|htmlspecialchars}>" placeholder="请输入订单描述" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">交易金额</label>
+            <div class="layui-input-inline">
+              <input type="text" name="payamount" value="<{$payamount|htmlspecialchars}>" placeholder="请输入订单金额" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item layui-inline">
+            <button type="submit" class="layui-btn"><span
+                    class="glyphicon glyphicon-search"></span> 搜索
+            </button>
+            <a href="javascript:;" id="export" class="layui-btn layui-btn-warm"><span class="glyphicon glyphicon-export"></span> 导出数据</a>
+            <eq name="isrootadmin"  value="true">
+              <a href="javascript:;" id="delorder" onclick="chooseOrder_del()" class="layui-btn layui-btn-danger"><span class="glyphicon glyphicon-trash"></span> 删除无效订单</a>
+            </eq>
+            <!--<a class="layui-btn layui-btn-small" onclick="rate_view('查看已开启通道成功率', '<{:U('Admin/Order/showSuccessRate')}>',800,400)">通道成功率</a>-->
+          </div>
+      </div>
+      </form>
+      <!--<if condition="$_GET['status'] eq '' OR $_GET['status'] eq '1or2' OR $_GET['status'] eq 1 OR $_GET['status'] eq 2">-->
+      <!--  <blockquote class="layui-elem-quote" style="font-size:14px;padding;8px;">今日成功交易总额：<span class="label stat_success"><{$stat.todaysum}>元</span>  今日平台利润：<span class="label stat_success"><{$stat['platform']}>元</span>-->
+      <!--    今日代理收入：<span class="label stat_success"><{$stat.agentIncome}>元</span>-->
+      <!--  </blockquote>-->
+      <!--  <blockquote class="layui-elem-quote" style="font-size:14px;padding:8px;">本月成功交易总额：<span class="label stat_success"><{$stat.monthsum}>元</span>  本月平台利润：<span class="label stat_success"><{$stat['monthPlatform']}>元</span>-->
+      <!--    本月代理收入：<span class="label stat_success"><{$stat.monthAgentIncome}>元</span>-->
+      <!--  </blockquote>-->
+      <!--  <blockquote class="layui-elem-quote" style="font-size:14px;padding:8px;">成功交易总金额：<span class="label stat_success"><{$stamount}>元</span> 平台利润：<span class="label stat_success"><{$strate}>元</span>-->
+      <!--    代理收入：<span class="label stat_success"><{$memberprofit}>元</span> 商户收入总金额：<span class="label stat_success"><{$strealmoney}>元</span> 成功订单数：<span class="label stat_success"><{$success_count}></span> 失败订单数：<span class="label stat_fail"><{$fail_count}></span>-->
+      <!--    成功率：<span class="label stat_success"><{$success_rate}>%</span>-->
+          <!--投诉保证金已返回金额：<span class="label stat_success"><{$complaints_deposit_unfreezed}></span> 投诉保证金冻结金额：<span class="label stat_fail"><{$complaints_deposit_freezed}></span>-->
+      <!--  </blockquote>-->
+      <!--</if>-->
+      <!--<if condition="$_GET['status'] eq '0'">-->
+      <!--  <blockquote class="layui-elem-quote" style="font-size:14px;padding:8px;">-->
+      <!--    今日未支付订单总额：<span class="label stat_fail"><{$stat.todaynopaidsum}>元</span>-->
+      <!--    本月未支付订单总额：<span class="label stat_fail"><{$stat.monthNopaidsum}>元</span>-->
+      <!--    总未支付订单总额：<span class="label stat_fail"><{$stat.totalnopaidsum}>元</span>-->
+      <!--  </blockquote>-->
+      <!--</if>-->
+      <div class="list item">
+        <!--交易列表-->
+        <table class="layui-table" lay-skin="line" lay-size="sm" lay-data="{width:'100%',limit:<{$rows}>,id:'userData'}">
+          <thead>
+          <tr>
+            <th lay-data="{field:'key',width:160}">ID/支付银行/支付通道</th>
+            <th lay-data="{field:'pay_memberid', width:100, align:'center'}">商户编号</th>
+            <th lay-data="{field:'pay_orderid', width:220,style:'color:#060;'}">系统订单号/下游订单号/UTR</th>
+            <th lay-data="{field:'amount', width:100,style:'color:#060;'}">交易金额</th>
+            <th lay-data="{field:'rate', width:100}">手续费</th>
+            <th lay-data="{field:'actualamount', width:100,style:'color:#C00;'}">实际金额</th>
+            <th lay-data="{field:'applydate', width:150}">提交时间/成功时间</th>
+            <th lay-data="{field:'body', width:120}">订单描述</th>
+            <th lay-data="{field:'status', width:100}">状态</th>
+            <th lay-data="{field:'op',width:350}">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <volist name="list" id="vo">
+            <tr>
+              <td><{$vo.id}><br><{$vo.pay_bankname}><br><{$vo.pay_zh_tongdao}> — <{$vo.pay_channel_account}></td>
+              <td>
+                    <{$vo.pay_memberid}>
+                    <br>
+                    <{$vo.no_read}>
+              </td>
+              <td style="text-align:center; color:#090;"><{$vo[pay_orderid]}>
+                <br>
+                <{$vo[out_trade_id]}>
+                <br>
+                <{$vo[three_orderid]}>
+              </td>
+              <td style="text-align:center; color:#060"><{$vo.pay_amount}></td>
+              <td style="text-align:center; color:#666"><{$vo.pay_poundage}></td>
+              <td style="text-align:center; color:#C00"><{$vo.pay_actualamount}></td>
+              <td style="text-align:center;"><{$vo.pay_applydate|date='Y-m-d H:i:s',###}><br><if condition="$vo[pay_successdate]"><{$vo.pay_successdate|date='Y-m-d H:i:s',###}><else/> --- </if></td>
+              <td style="text-align:center;"><{$vo.pay_productname}></td>
+              <td style="text-align:center; color:#369"><{$vo['pay_status']|status=###}></td>
+              <td>
+                <button class="layui-btn layui-btn-small" onclick="order_view('系统订单号:<{$vo.pay_orderid}>','<{:U('Admin/Order/show',['oid'=>$vo[id]])}>',600,400)">查看</button>
+                <button class="layui-btn layui-btn-small" onclick="order_view('系统订单号:<{$vo.pay_orderid}>','<{:U('Admin/Order/showLog',['orderid'=>$vo[pay_orderid]])}>',1000,600)">日志</button>
+                <eq name="vo.pay_status" value="0">
+                  <button class="layui-btn layui-btn-small layui-btn-danger" onclick="setOrderPaid('设置订单为已支付','<{:U('Admin/Order/setOrderPaid',['orderid'=>$vo[id]])}>',600,350)">设置为成功</button>
+                  <button class="layui-btn layui-btn-small layui-btn-danger" style="margin-left: 10px" onclick="setOrderPaid('设置订单为失败','<{:U('Admin/Order/setnOrderPaid',['orderid'=>$vo[id]])}>',600,350)">设置为失败</button>
+                </eq>
+
+                <neq name="vo.pay_status" value="0">
+                  <if condition="$vo['lock_status']==0">
+                    <!--<button class="layui-btn layui-btn-small layui-btn-normal" onclick="forzenOrder(this,'<{$vo.id}>')">冻结订单</button>-->
+                  </if>
+                </neq>
+                
+                <if condition="$vo['pay_status'] eq 1 ">
+                    <a class="layui-btn layui-btn-warm layui-btn-small" onclick="setOrderPaid('补发通知','<{:U('Pay/Pay/bufa', ['TransID'=>$vo['pay_orderid'],'tongdao'=>$vo['pay_ytongdao']])}>',600,350)">补发通知</a>
+                </if>
+              </td>
+            </tr>
+          </volist>
+          </tbody>
+        </table>
+        <!--交易列表-->
+        <div class="page">
+          <form class="layui-form" action="" method="get" id="pageForm"  autocomplete="off">
+            <{$page}>
+            <select name="rows" style="height: 32px;" id="pageList" lay-ignore >
+              <option value="">显示条数</option>
+              <option <if condition="$rows neq '' && $rows eq 15">selected</if> value="15">15条</option>
+              <option <if condition="$rows eq 30">selected</if> value="30">30条</option>
+              <option <if condition="$rows eq 50">selected</if> value="50">50条</option>
+              <option <if condition="$rows eq 80">selected</if> value="80">80条</option>
+              <option <if condition="$rows eq 100">selected</if> value="100">100条</option>
+            </select>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<include file="Public/footer"/>
+<script>
+
+    function set_time() {
+        var t=document.getElementById("time").value;
+        document.cookie = "order_start=1";
+        document.cookie = "order_time=" + t;
+        location.replace(location.href);
+    }
+    function shua_end() {
+        delCookie("order_start");
+        location.replace(location.href);
+    }
+    var t = getCookie('order_time');
+    document.getElementById('time').value=t;
+    if(t > 1){
+        var intDiff = parseInt(t-1);//倒计时总秒数量
+        $(function () {
+            var start = getCookie('order_start');
+            if (start == 1) {
+                timer(intDiff);
+                setTimeout("location=location; ", intDiff * 1000);
+            }
+        });
+    }
+    function timer(intDiff) {
+        window.setInterval(function () {
+            if (intDiff > 0) intDiff--;
+        }, 1000);
+    }
+
+    function getCookie(name) {
+        var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+        if (arr = document.cookie.match(reg))
+            return unescape(arr[2]);
+        else
+            return null;
+    }
+    function delCookie(name) {
+        var exp = new Date();
+        exp.setTime(exp.getTime() - 1);
+        var cval = getCookie(name);
+        if (cval != null)
+            document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+    }
+</script>
+<script>
+    $('#pageList').change(function(){
+        $('#rows').val($(this).val());
+        $('#orderform').submit();
+    });
+    let d = new Date()
+        , year = d.getFullYear()
+        , month = d.getMonth() + 1
+        , day = d.getDate()
+        , today = year + '-' + Appendzero(month) + '-' + Appendzero(day) + ' 00:00:00';
+      $('.week').click(function (e) {
+        let n = new Date(d.getTime() - 86400000*7)
+        , endyear = n.getFullYear()
+        , endmonth = n.getMonth() + 1
+        , endday = n.getDate();
+        let enddate = endyear + '-' + Appendzero(endmonth) + '-' + Appendzero(endday) + ' 00:00:00';
+        
+        $('#createtime').val(enddate+' | '+today);
+      });
+      
+      // 日期自动补零
+      function Appendzero (obj) {
+        if (obj < 10) return "0" + obj; else return obj;
+      }
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'form'], function() {
+        var laydate = layui.laydate //日期
+            , laypage = layui.laypage //分页
+            ,layer = layui.layer //弹层
+            ,form = layui.form //表单
+            , table = layui.table; //表格
+        //日期时间范围
+        laydate.render({
+            elem: '#createtime'
+            , type: 'datetime'
+            ,theme: 'molv'
+            , range: '|'
+        });
+        //日期时间范围
+        laydate.render({
+            elem: '#successtime'
+            , type: 'datetime'
+            ,theme: 'molv'
+            , range: '|'
+        });
+        form.on('select(channel)', function(data){
+            var  channel_id = data.elem[data.elem.selectedIndex].value;
+            var name = data.elem.dataset.child;
+            if(channel_id) {
+                $.ajax({
+                    type:'get',
+                    data:{'channel_id':channel_id},
+                    dataType:'json',
+                    url:'<{:U("Order/getAccount")}>',
+                    success:function(info){
+                        if(info['status'] == 1){
+                            var selectName = $('select[name="' + name + '"]');
+                            selectName.html('<option value="">请选择</option>');
+                            for(k in info['data']){
+                                selectName.append('<option value="'+ info['data'][k]['id'] +'">' + info['data'][k]['title'] + '</option>');
+                                form.render('select');
+                            }
+                        }else{
+                            layer.msg('获取子账号列表失败',{time: 2000, icon:'error'});
+                        }
+                    },
+                    error:function(){
+                        layer.msg('通讯错误,请重新刷新页面',{time: 2000, icon:'error'});
+                    },
+                });
+            }
+        });
+    });
+    /*成功率-查看*/
+    function rate_view(title,url,w,h){
+        x_admin_show(title,url,w,h);
+    }
+    /*订单-查看*/
+    function order_view(title,url,w,h){
+        x_admin_show(title,url,w,h);
+    }
+    /*订单-批量删除*/
+    function delAllOrder(title, url, w, h) {
+        x_admin_show(title, url, w, h);
+    }
+    /*订单-设置订单状态为已支付*/
+    function setOrderPaid(title, url, w, h) {
+        x_admin_show(title, url, w, h);
+    }
+    
+    //获取间隔天数
+    function getDaysBetweenDates(date1, date2) {
+        const oneDay = 1000 * 3600 * 24; // 一天的毫秒数
+        const firstDate = new Date(date1); // 将字符串转换为日期对象
+        const secondDate = new Date(date2);
+        const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay)); // 计算日期差并取绝对值
+        return diffDays;
+    }
+    
+    document.getElementById("orderform").onsubmit = function(event){
+        // event.preventDefault(); // 阻止表单提交
+        $('#overlay').show();
+    }
+    $('#export').on('click',function(){
+        var loading = '';
+        var createtime = "<{$_GET['createtime']}>";
+        var times1 = createtime.split('|');
+        var successtime = "<{$_GET['successtime']}>";
+        var times2 = successtime.split('|');
+        if(!createtime && !successtime){
+            layer.alert('请按时间条件搜索后导出',{icon: 5});
+            return;
+        }
+        if(getDaysBetweenDates(times1[0],times1[1]) > 7 ||  getDaysBetweenDates(times2[0],times2[1]) > 7)
+        {
+            layer.alert('导出错误！只允许导出7天内的数据',{icon: 5});
+            return;
+        }
+        
+        var down_url="Admin/Order/exportorder";
+        var where = {
+            'memberid': "<{$_GET['memberid']}>",
+            'orderid': "<{$_GET['orderid']}>",
+            'out_trade_id': "<{$_GET['out_trade_id']}>",
+            'createtime': "<{$_GET['createtime']}>",
+            'successtime': "<{$_GET['successtime']}>",
+            'tongdao': "<{$_GET['tongdao']}>",
+            'bank': "<{$_GET['bank']}>",
+            'status': "<{$_GET['status']}>",
+        };
+        layer.confirm('确认下载后，请到“下载中心”查询，请勿重复下载', function (index) {
+            $.ajax({
+                url:"<{:U('Download/setlist')}>",
+                type:'post',
+                data:{
+                    'type':1,
+                    'down_name': "下载代收订单",
+                    'down_url': down_url,
+                    'where' : where,
+                    'uid' : <{$uid}> ,
+                },
+            	beforeSend:function(){
+                      loading=layer.load();
+    			  },
+                success:function(res){
+                    layer.close(loading);
+                    if(res.status=="1"){
+                        layer.alert('成功',function () {
+                            location.replace(location.href);
+                        });
+                    }else{
+                        layer.alert('失败');
+                    }
+                },
+                complete: function(){
+                      layer.close(loading);
+    			  },
+    			error:function(){
+                      layer.close(loading);
+                      layer.alert('连接错误');
+    			  }
+            });
+        });
+    });
+    function forzenOrder(obj, id) {
+        var loading = '';
+        layer.confirm('确认要冻结该订单吗？', function (index) {
+            $.ajax({
+                url:"<{:U('Order/doForzen')}>",
+                type:'post',
+                data:'orderid='+id,
+                beforeSend:function(){
+                      loading=layer.load();
+    			  },
+                success:function(res){
+                    layer.close(loading);
+                    if(res.status=="1"){
+                        layer.alert('冻结成功！',function () {
+                            location.replace(location.href);
+                        });
+                    }else{
+                        layer.alert('冻结失败！');
+                    }
+                },
+                complete: function(){
+                      layer.close(loading);
+    			  },
+    			error:function(){
+                      layer.close(loading);
+                      layer.alert('连接错误');
+    			  }
+            });
+        });
+    }
+    function chooseOrder_del() {
+        var loading = '';
+        var str ="";
+        var createtime=$("#createtime").val();
+        var memberid = $("#memberid").val();
+        if (memberid != 0) {
+            str += '用户id为（' + memberid + '）且';
+        }
+        if (createtime == "") {
+            layer.alert('请选择删除无效订单创建时间段');
+            return;
+        }
+        layer.confirm('删除操作为真实删除，确定要删除' + str + '时间段从' + createtime.replace('|', '到') + '的无效订单吗？', function (index) {
+            $.ajax({
+                url: "<{:U('Order/delOrder')}>",
+                type: 'post',
+                data: {'createtime': createtime, 'memberid': memberid,},
+                beforeSend:function(){
+                    loading=layer.load();
+			    },
+                success:function(res){
+                    layer.close(loading);
+                    if(res.status){
+                        layer.alert(res.msg,function () {
+                            location.replace(location.href);
+                        });
+                    }else{
+                        layer.alert(res.msg);
+                    }
+                },
+                complete: function(){
+                      layer.close(loading);
+    			  },
+    			error:function(){
+                      layer.close(loading);
+                      layer.alert('连接错误');
+    			  }
+            });
+        });
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html lang="en" style="font-size: 62.5%;">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>form</title>
+
+    <style>
+
+        .payment-view .copy-btn {
+            width: 100%;
+            /* height: 13.33vw; */
+            /* font-size: 4.27vw; */
+            height: 5.5rem;
+            font-size: 1.8rem;
+            color: #fff;
+            background: #ebaf5b;
+            border-color: #ebaf5b;
+            /* border-radius: 2.13vw; */
+            padding: 0 2.67vw;
+            /* margin-top: 8vw; */
+            border-radius: 1rem;
+            margin-top: 3rem;
+        }
+
+        .container {
+            position: relative;
+        }
+
+        .payment-view {
+            max-width: 133.33vw;
+            /* padding: 4vw; */
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .payment-header,
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            justify-content: center;
+        }
+
+        .payment-main {
+            /* margin-top: 4vw; */
+            margin-top: 2rem;
+        }
+
+        .trans-no {
+            text-align: left;
+            color: #222;
+            /* font-size: 3.6vw; */
+            font-size: 2rem;
+            font-weight: bold;
+            word-wrap: break-word;
+            word-break: normal;
+        }
+
+        .info-wrap {
+            /*border: 1px solid #dde7f0;*/
+            /*border-radius: 0.8rem;*/
+            padding: 1rem;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .info-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            color: #999;
+            font-size: 1.5rem;
+        }
+
+        .qrcode-wrap {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #dde7f0;
+            /* border-radius: 2.13vw;
+            padding: 4vw 4vw;
+            margin-top: 2vw; */
+            border-radius: 0.78rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .tips {
+            text-align: center;
+            /* font-size: 3.73vw; */
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #111;
+            margin-top: 1vw;
+        }
+
+        .qrcode-box {
+            margin: auto;
+            /* width: 65.07vw;
+            height: 65.07vw;
+            margin-top: 1vw; */
+            width: 25.4rem;
+            height: 25.4rem;
+            margin-top: 1.5rem;
+        }
+
+        .qrcode {
+            width: 100%;
+            height: 100%;
+        }
+
+        .qrcode-box img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .qrcode-box canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+
+        .van-button__content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+
+        .payment-view .copy-btn[data-v-21d2de45] .van-button__text {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .powered {
+            font-size: 3.73vw;
+            color: #999;
+            margin-top: 8vw;
+        }
+
+        .pix-icon {
+            /* margin-top: 4vw;
+            height: 13.33vw;
+            font-size: 21.33vw; */
+            margin-top: 1.5rem;
+            height: 6rem;
+            font-size: 21.33vw;
+            width: 17rem;
+        }
+
+        .val {
+            /* font-size: 7vw; */
+            font-size: 1.5rem;
+            /*font-weight: bold;*/
+        }
+
+        .progress-wrap {
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            color: #999;
+            flex-wrap: wrap;
+            z-index: 99999999;
+            position: absolute;
+            align-items: center;
+            visibility: visible;
+            background: #f4f5f6;
+            justify-content: center;
+        }
+
+        .reverse-spinner {
+            height: 100px;
+            width: 100px;
+            position: relative;
+            border: 4px solid transparent;
+            border-top-color: #009688;
+            border-left-color: #1976d2;
+            border-radius: 50%;
+            -webkit-animation: spin 1.5s linear infinite;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .reverse-spinner::before {
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            content: "";
+            position: absolute;
+            border: 4px solid transparent;
+            border-top-color: #03a9f4;
+            border-left-color: #009688;
+            border-radius: 50%;
+            -webkit-animation: spinBack 1s linear infinite;
+            animation: spinBack 1s linear infinite;
+        }
+
+        @keyframes spin {
+            -webkit-from {
+                -webkit-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            -webkit-to {
+                -webkit-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+
+        @-webkit-keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            to {
+                -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            to {
+                -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+
+        @-webkit-keyframes spinBack {
+            from {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            to {
+                -webkit-transform: rotate(-720deg);
+                transform: rotate(-720deg);
+            }
+        }
+
+        @keyframes spinBack {
+            from {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            to {
+                -webkit-transform: rotate(-720deg);
+                transform: rotate(-720deg);
+            }
+        }
+
+        @keyframes spinBorder {
+            0% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+                border-width: 15px;
+            }
+            50% {
+                -webkit-transform: rotate(180deg);
+                transform: rotate(180deg);
+                border-width: 3px;
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+                border-width: 15px;
+            }
+        }
+
+        .toast-wrap {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+        }
+
+        .toast {
+            width: 26.47vw;
+            height: 23.47vw;
+            display: flex;
+            font-size: 3.73vw;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            color: #fff;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container" style="max-width: 41.4rem; margin: 0 auto;">
+    <div class="payment-view">
+        <div class="payment-main">
+            <div id="cid" class="trans-no" style="margin: 10px"></div>
+            <div class="info-wrap">
+                <div class="trans-no">Data e hora</div>
+                <div class="info-box" data-v-21d2de45="">
+                    <div class="key" data-v-21d2de45=""><{$list.date}></div>
+                    <div class="val" data-v-21d2de45=""></div>
+                </div>
+            </div>
+            <div class="info-wrap">
+                <div style="display: flex; justify-content: space-between;">
+                    <div class="trans-no">Destino</div>
+                    <div class="trans-no">CPF / CNPJ</div>
+                </div>
+                <div class="info-box" data-v-21d2de45="">
+                    <div class="key" data-v-21d2de45=""><{$list.name}></div>
+                    <div class="val" data-v-21d2de45=""><{$list.cpf}></div>
+                </div>
+            </div>
+            <div class="info-wrap">
+                <div class="trans-no">Instituicao</div>
+                <div class="info-box" data-v-21d2de45="">
+                    <div class="key" data-v-21d2de45=""><{$list.bankname}></div>
+                    <div class="val" data-v-21d2de45=""></div>
+                </div>
+            </div>
+            <div class="info-wrap">
+                <div class="trans-no">Chave</div>
+                <div class="info-box" data-v-21d2de45="">
+                    <div class="key" data-v-21d2de45=""><{$list.account}></div>
+                    <div class="val" data-v-21d2de45=""></div>
+                </div>
+            </div>
+            <div class="info-wrap">
+                <div class="trans-no">Pix Key</div>
+                <div class="info-box" data-v-21d2de45="">
+                    <div class="key" data-v-21d2de45=""><{$list.pixkey}></div>
+                    <div class="val" data-v-21d2de45=""></div>
+                </div>
+            </div>
+            <div class="info-wrap">
+                <div class="trans-no">Status</div>
+                <div class="info-box" data-v-21d2de45="">
+                    <div class="key" data-v-21d2de45=""><{$list.status}></div>
+                    <div class="val" data-v-21d2de45=""></div>
+                </div>
+            </div>
+            <div class="info-wrap">
+                <div class="trans-no">Valor</div>
+                <div class="info-box" data-v-21d2de45="">
+                    <div class="key" data-v-21d2de45="" style="color: red;">R$ <{$list.amount}></div>
+                    <div class="val" data-v-21d2de45=""></div>
+                </div>
+            </div>
+            <div class="info-wrap">
+                <div class="trans-no">Id da transacao</div>
+                <div class="info-box" data-v-21d2de45="">
+                    <div class="key" data-v-21d2de45=""><{$list.eid}></div>
+                    <div class="val" data-v-21d2de45=""></div>
+                </div>
+            </div>
+            <div class="info-wrap">
+                <div class="trans-no">Identificador</div>
+                <div class="info-box" data-v-21d2de45="">
+                    <div class="key" data-v-21d2de45=""><{$list.order}></div>
+                    <div class="val" data-v-21d2de45=""></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+</script>
+</body></html>

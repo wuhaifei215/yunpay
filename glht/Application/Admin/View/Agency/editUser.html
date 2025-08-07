@@ -1,0 +1,106 @@
+<include file="Public/header"/>
+<div class="row">
+	<div class="col-sm-12">
+		<form class="layui-form" action="" id="profile">
+			<input type="hidden" name="userid" value="<{$u.id}>">
+			<div class="layui-form-item">
+				<label class="layui-form-label">包网名：</label>
+				<div class="layui-input-inline">
+					<input type="text" name="u[username]" lay-verify="required" autocomplete="off"
+						   value="<{$u.username|htmlentities}>"
+						   placeholder="包网名"
+						   class="layui-input"
+					<if condition="$u.id gt 0">disabled="disabled"</if>
+					>
+				</div>
+			</div>
+            <if condition="$verifyGoogle and $verifysms">
+				<div class="layui-form-item" id="df_auto_check">
+					<label class="layui-form-label">验证方式：</label>
+					<div class="layui-input-block">
+						<input type="radio" name="auth_type" lay-filter="auth_type" value="1" title="谷歌安全码" checked>
+						<input type="radio" name="auth_type" lay-filter="auth_type" value="0" title="短信验证码">
+					</div>
+				</div>
+			<else />
+				<input type="hidden" name="auth_type" value="<{$auth_type}>">
+			</if>
+			<eq name="verifyGoogle" value="1">
+			<div class="layui-form-item" id="auth_google">
+				<label class="layui-form-label">谷歌安全码：</label>
+				<div class="layui-input-inline">
+					<input type="text" name="google_code" autocomplete="off"
+						   placeholder="请输入谷歌安全码" class="layui-input" value="">
+				</div>
+			</div>
+			</eq>
+			<eq name="verifysms" value="1">
+				<div class="layui-form-item" id="auth_sms" <if condition="$verifyGoogle and $verifysms">style="display: none"</if>>
+				<label class="layui-form-label">手机验证码：</label>
+				<div class="layui-input-inline">
+					<input type="text" name="code"  autocomplete="off"
+						   placeholder="请输入短信验证码" class="layui-input" value="">
+				</div>
+				<div class="layui-input-inline">
+					<a href="javascript:;" id="sendBtn" data-mobile="<{$mobile}>" class="layui-btn">发送验证码</a>
+				</div>
+			</div>
+			</eq>
+				
+            <div class="layui-form-item">
+            	<div class="layui-input-block">
+            		<button class="layui-btn" lay-submit="submit" lay-filter="save">提交保存</button>
+            	</div>
+            </div>
+        </form>
+    </div>
+</div>
+<include file="Public/footer"/>
+<script>
+    layui.use(['layer', 'form','laydate'], function(){
+        var form = layui.form
+            ,laydate = layui.laydate
+            ,layer = layui.layer;
+
+        //常规用法
+        laydate.render({
+            elem: '#birthday'
+        });
+        form.on('radio(df_api)',function(data){
+            if(data.value == 1) {
+                $('#df_auto_check').show();
+                $('#df_domain').show();
+                $('#df_auto').show();
+            } else {
+                $('#df_auto_check').hide();
+                $('#df_domain').hide();
+                $('#df_auto').hide();
+            }
+        });
+        //监听提交
+        form.on('submit(save)', function(data){
+            $.ajax({
+                url:"<{:U('Agency/saveUser')}>",
+                type:"post",
+                data:$('#profile').serialize(),
+                success:function(res){
+                    if(res.status){
+                        layer.alert("编辑成功", {icon: 6},function () {
+                            parent.location.reload();
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        });
+                    }else{
+                        layer.alert("操作失败:" + res.msg, {icon: 5},function (index) {
+                            layer.close(index)
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+<!--统计代码，可删除-->
+</body>
+</html>

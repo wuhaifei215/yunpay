@@ -1,0 +1,124 @@
+<include file="Public/header"/>
+    <style type="text/css">
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 10;
+    }
+    </style>
+    <div class="row">
+        <div class="overlay" id="overlay"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ibox float-e-margins">
+                <!--条件查询-->
+                <div class="ibox-title">
+                    <h5>对账单</h5>
+                    <div class="ibox-tools">
+                        <i class="layui-icon" onclick="location.replace(location.href);" title="刷新"
+                           style="cursor:pointer;">ဂ</i>
+                    </div>
+                </div>
+                <!--条件查询-->
+                <div class="ibox-content">
+                    <form class="layui-form" action="" method="get" autocomplete="off" id="dataform">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">商户号：</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="memberid" autocomplete="off" placeholder="请输入商户号" class="layui-input" value="<{$memberid}>">
+                            </div>
+                            <!--<label class="layui-form-label">日期：</label>-->
+                            <!--<div class="layui-input-inline" style="width:300px;">-->
+                            <!--    <input type="text" class="layui-input" name="date" id="date" placeholder="日期"  value="<{$date}>">-->
+                            <!--</div>-->
+                            <div class="layui-inline">
+                                <button type="submit" class="layui-btn"><span
+                                        class="glyphicon glyphicon-search"></span> 搜索
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <blockquote class="layui-elem-quote" style="font-size:14px;padding;8px;">报告生成时间：<{:date('Y-m-d H:i:s')}></blockquote>
+                    <table class="layui-table" lay-data="{width:'100%''}">
+                        <thead>
+                        <tr>
+                            <th lay-data="{field:'date',width:110,style:'text-align:center;',fixed: true}">日期</th>
+                            <volist name="channel" id="cho">
+                                <th lay-data="{field:'order_success_amount<{$cho.id}>',style:'text-align:center;color:#060;',width:180}"><{$cho.title}>--成功总金额</th>
+                                <th lay-data="{field:'order_success_count<{$cho.id}>',style:'text-align:center;',width:180}"><{$cho.title}>--成功笔数</th>
+                                <th lay-data="{field:'order_success_rate<{$cho.id}>',style:'text-align:center;color:#003b88;',width:180}"><{$cho.title}>--成功率</th>
+                                <th lay-data="{field:'order_success_average<{$cho.id}>',style:'text-align:center;',width:180}"><{$cho.title}>--总均单</th>
+                            </volist>
+                            <volist name="payChannel" id="payo">
+                                <th lay-data="{field:'wttklist_success_amount<{$payo.id}>',style:'text-align:center;color:#C00;',width:180}"><{$payo.title}>--成功总金额</th>
+                                <th lay-data="{field:'wttklist_success_count<{$payo.id}>',style:'text-align:center;',width:180}"><{$payo.title}>--成功笔数</th>
+                            </volist>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <volist name="list" id="vo" key="k">
+                                <tr>
+                                    <td><{$vo.date}></td>
+                                    <volist name="channel" id="cho">
+                                        <?php 
+                                            $arr = $vo['payin'][$cho[id]];
+                                        ?>
+                                        <td><{$arr[order_success_amount]}></td>
+                                        <td><{$arr[order_success_count]}></td>
+                                        <td><{$arr[order_success_rate]}> %</td>
+                                        <td><{$arr[order_success_average]}></td>
+                                    </volist>
+                                    
+                                    <volist name="payChannel" id="payo">
+                                        <?php 
+                                            $arr = $vo['payout'][$payo[id]];
+                                        ?>
+                                            <td><{$arr[wttklist_success_amount]}></td>
+                                            <td><{$arr[wttklist_success_count]}></td>
+                                    </volist>
+                                </tr>
+                            </volist>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+<include file="Public/footer"/>
+<script>
+
+    layui.use(['form','table',  'laydate', 'layer'], function () {
+        var form = layui.form
+            ,table = layui.table
+
+            , layer = layui.layer
+            , laydate = layui.laydate;
+
+        //日期时间范围
+        laydate.render({
+            elem: '#date'
+            , type: 'datetime'
+            ,theme: 'molv'
+            , range: '|'
+        });
+    });
+
+    $('#pageList').change(function(){
+        $('#rows').val($(this).val());
+        $('#dataform').submit();
+    });
+    document.getElementById("dataform").onsubmit = function(event){
+        // event.preventDefault(); // 阻止表单提交
+        $('#overlay').show();
+    }
+
+</script>
+</body>
+</html>

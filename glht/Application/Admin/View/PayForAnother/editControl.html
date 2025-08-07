@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="renderer" content="webkit">
+<title><{:C("WEB_TITLE")}></title>
+<link rel="shortcut icon" href="favicon.ico">
+<link href="/Public/Front/css/bootstrap.min.css" rel="stylesheet">
+<link href="/Public/Front/css/font-awesome.min.css" rel="stylesheet">
+<link href="/Public/Front/css/animate.css" rel="stylesheet">
+<link href="/Public/Front/css/style.css" rel="stylesheet">
+<link rel="stylesheet" href="/Public/Front/js/plugins/layui/css/layui.css">
+<style>
+.layui-form-label {width:110px;padding:4px}
+</style>
+<body>
+    <div class="wrapper wrapper-content animated">
+        <div class="row">
+            <div class="col-sm-12">
+    			<form class="layui-form" action="" id="editRate">
+                	<input type="hidden" name="id" value="<{$_GET['id']}>">
+                	<input type="hidden" name="tab" value="1">
+                	<div class="layui-form-item">
+                		<label class="layui-form-label">单笔最小金额：</label>
+                		<div class="layui-input-inline">
+                			<input type="number" min="0" name="u[tkzxmoney]" autocomplete="off" value="<{$configs.tkzxmoney}>"
+                				   placeholder="0.00" class="layui-input">
+                		</div>
+                		<label class="layui-form-label">单笔最大金额：</label>
+                		<div class="layui-input-inline">
+                			<input type="number" min="0" name="u[tkzdmoney]" autocomplete="off" value="<{$configs.tkzdmoney}>"
+                				   placeholder="0.00" class="layui-input">
+                		</div>
+                	</div>
+                
+                	<div class="layui-form-item">
+                		<label class="layui-form-label">当日总金额：</label>
+                		<div class="layui-input-inline">
+                			<input type="number" min="0" name="u[dayzdmoney]" autocomplete="off" value="<{$configs.dayzdmoney}>"
+                				   placeholder="0.00" class="layui-input">
+                		</div>
+                		<label class="layui-form-label">当日总次数：</label>
+                		<div class="layui-input-inline">
+                			<input type="number" min="0" name="u[dayzdnum]" autocomplete="off" value="<{$configs.dayzdnum}>"
+                				   placeholder="0" class="layui-input">
+                		</div>
+                	</div>
+                
+                	<!--<div class="layui-form-item">-->
+                	<!--	<label class="layui-form-label">单人单卡单日最高提现额：</label>-->
+                	<!--	<div class="layui-input-inline">-->
+                	<!--		<input type="number" min="0" name="u[daycardzdmoney]" autocomplete="off" value="<{$configs.daycardzdmoney}>"-->
+                	<!--			   placeholder="0.00" class="layui-input">-->
+                	<!--	</div>-->
+                	<!--</div>-->
+                	<div class="layui-form-item">
+                		<label class="layui-form-label">结算方式：</label>
+                		<div class="layui-input-block">
+                			<input type="radio" name="u[t1zt]" <if condition="$configs[t1zt] eq 0">checked</if> value="0" title="T+0"
+                			checked="">
+                			<input type="radio" name="u[t1zt]" <if condition="$configs[t1zt] eq 1">checked</if> value="1" title="T+1">
+                			<input type="radio" name="u[t1zt]" <if condition="$configs[t1zt] eq 7">checked</if> value="7" title="T+7（每周一允许结算）">
+                			<input type="radio" name="u[t1zt]" <if condition="$configs[t1zt] eq 30">checked</if> value="30" title="T+30（每月第一天允许结算）">
+                		</div>
+                	</div>
+                
+                	<!--<div class="layui-form-item">
+                		<label class="layui-form-label">结算方式：</label>
+                		<div class="layui-input-block">
+                			<input type="radio" name="u[t0zt]" <if condition="$configs[t0zt] eq 0">checked</if> value="0" title="关闭" checked="">
+                			<input type="radio" name="u[t0zt]" <if condition="$configs[t0zt] eq 1">checked</if> value="1" title="开通">
+                		</div>
+                	</div>-->
+                <!-- 	<div class="layui-form-item">
+                		<label class="layui-form-label">购买T+0金额：</label>
+                		<div class="layui-input-inline">
+                			<input type="number" min="0" name="u[gmt0]" autocomplete="off" value="<{$configs.gmt0}>"
+                				   placeholder="0.00" class="layui-input">
+                		</div>
+                	</div> -->
+                
+                	<div class="layui-form-item">
+                		<label class="layui-form-label">手续费类型：</label>
+                		<div class="layui-input-inline">
+                			<select name="u[tktype]" lay-verify="required" lay-search="">
+                				<option value=""></option>
+                				<option <if condition="$configs['tktype'] eq 0">selected</if> value="0">按比例计算</option>
+                				<option <if condition="$configs['tktype'] eq 1">selected</if> value="1">按单笔计算</option>
+				                <option <if condition="$configs['tktype'] eq 2">selected</if> value="2">按单笔加比例计算</option>
+                			</select>
+                		</div>
+                	</div>
+                	<div class="layui-form-item">
+                		<label class="layui-form-label">单笔提款比例（%）：</label>
+                		<div class="layui-input-inline">
+                			<input type="number" min="0" step="0.1" name="u[sxfrate]" autocomplete="off"
+                				   value="<{$configs.sxfrate}>" placeholder="%" class="layui-input">
+                		</div>
+                		<label class="layui-form-label">单笔提款收取（元）：</label>
+                		<div class="layui-input-inline">
+                			<input type="number" min="0" name="u[sxffixed]" autocomplete="off" value="<{$configs.sxffixed}>"
+                				   placeholder="0.00" class="layui-input">
+                		</div>
+                	</div>
+                	<div class="layui-form-item">
+                		<label class="layui-form-label">手续费扣除方式：</label>
+                		<div class="layui-input-block">
+                			<input type="radio" name="u[tk_charge_type]" value="0" title="从到账金额扣" <if
+                				condition="$configs['tk_charge_type'] eq 0">checked
+                		</if>>
+                		</div>
+                		<input type="radio" name="u[tk_charge_type]" value="1" title="从商户余额扣" <if
+                			condition="$configs['tk_charge_type'] eq 1">checked
+                		</if>>
+                	</div>
+                	<div class="layui-form-item">
+                		<label class="layui-form-label">提款状态：</label>
+                		<div class="layui-input-block">
+                			<input type="radio" name="u[tkzt]" <if condition="$configs[tkzt] eq 0">checked</if> value="0" title="关闭" checked="">
+                			<input type="radio" name="u[tkzt]" <if condition="$configs[tkzt] eq 1">checked</if> value="1" title="开通">
+                		</div>
+                	</div>
+                	<if condition="$verifyGoogle and $verifysms">
+    				<div class="layui-form-item" id="df_auto_check">
+    					<label class="layui-form-label">验证方式：</label>
+    					<div class="layui-input-block">
+    						<input type="radio" name="auth_type" lay-filter="auth_type" value="1" title="谷歌安全码" checked>
+    						<input type="radio" name="auth_type" lay-filter="auth_type" value="0" title="短信验证码">
+    					</div>
+    				</div>
+					<else />
+    					<input type="hidden" name="auth_type" value="<{$auth_type}>">
+    				</if>
+    				<eq name="verifyGoogle" value="1">
+        				<div class="layui-form-item" id="auth_google">
+        					<label class="layui-form-label">谷歌安全码：</label>
+        					<div class="layui-input-inline">
+        						<input type="text" name="google_code" autocomplete="off"
+        							   placeholder="请输入谷歌安全码" class="layui-input" value="">
+        					</div>
+        				</div>
+    				</eq>
+    				<eq name="verifysms" value="1">
+    					<div class="layui-form-item" id="auth_sms" <if condition="$verifyGoogle and $verifysms">style="display: none"</if>>
+    					<label class="layui-form-label">手机验证码：</label>
+    					<div class="layui-input-inline">
+    						<input type="text" name="code"  autocomplete="off"
+    							   placeholder="请输入短信验证码" class="layui-input" value="">
+    					</div>
+    					<div class="layui-input-inline">
+    						<a href="javascript:;" id="sendBtn" data-mobile="<{$mobile}>" class="layui-btn">发送验证码</a>
+    					</div>
+    				</div>
+    				</eq>
+                	<div class="layui-form-item">
+                		<div class="layui-input-block">
+                			<button class="layui-btn" lay-submit="submit" lay-filter="save">提交保存</button>
+                		</div>
+                	</div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/Public/Front/js/jquery.min.js"></script>
+    <script src="/Public/Front/js/bootstrap.min.js"></script>
+    <script src="/Public/Front/js/plugins/peity/jquery.peity.min.js"></script>
+    <script src="/Public/Front/js/content.js"></script>
+	<script src="/Public/Front/js/plugins/layui/layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+layui.use(['layer', 'form'], function(){
+  var form = layui.form
+  ,layer = layui.layer;
+  
+  //监听提交
+  form.on('submit(save)', function(data){
+    $.ajax({
+		url:"<{:U('PayForAnother/editControl')}>",
+		type:"post",
+		data:$('#editRate').serialize(),
+		success:function(res){
+			if(res.status){
+				layer.alert("编辑成功", {icon: 6},function () {
+					var index = parent.layer.getFrameIndex(window.name);
+					parent.layer.close(index);
+					parent.$('#dfRate'+res.data.pid).text(res.data.defaultrate);
+					parent.$('#fdRate'+res.data.pid).text(res.data.fengding);
+				});
+			}else{
+				var msg = res['msg']?res['msg']:'操作失败';
+                layer.msg(msg , {icon: 5},function () {
+                    var index = parent.layer.getFrameIndex(window.name);
+                    // parent.layer.close(index);
+                });
+                return false;
+            }
+		}
+	});
+    return false;
+  });
+});
+</script>
+    <!--统计代码，可删除-->
+</body>
+</html>

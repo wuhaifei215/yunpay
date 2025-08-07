@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <title>收银台</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body style="background-color: #ecedf2;">
+<div class="container" style="background-color:#fff;padding:15px;min-width: 300px;max-width: 640px;">
+    <div class="row">
+        <!--交易信息-->
+        <div class="col-md-12">
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="weixin" style="border-top: 1px dashed #E7EAEC;">
+                    <table border="0" align="center" cellpadding="0" cellspacing="0">
+                        <tbody>
+                            <tr align="center">
+                                <td height="40" align="center">
+                                    <font>订单：<{$params.out_trade_id}></font>
+                                </td>
+                            </tr>
+                            <tr align="center">
+                                <td height="60"><strong><font style="font-size:40px; color:#F60; line-height: 1;"><{$money}></font>&nbsp;&nbsp;(元)</strong></td>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <img src="<{$imgurl}>" width="320" height="320">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td height="40" align="center">
+                                    <font style="font-size:18px;">请先保存二维码图片<br/>再使用<font style="color:#F60; line-height: 1;">微信</font>或<font style="color:#F60; line-height: 1;">支付宝</font>扫一扫<br/>识别相册二维码图片付款<br/></font>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--收银台-->
+<script src="/Public/Front/js/jquery.min.js"></script>
+<script src="/Public/Front/js/bootstrap.min.js"></script>
+</body>
+</html>

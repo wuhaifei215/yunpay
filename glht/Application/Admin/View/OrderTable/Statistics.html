@@ -1,0 +1,356 @@
+<include file="Public/header"/>
+<if condition="$list_h">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div id="h_time" style="height:315px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div id="h_money" style="height:315px;"></div>
+            </div>
+        </div>
+    </div>
+    <else />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <strong style="font-size: 20px; color: red; padding:5px 10px;"> 没有24小时内的订单数据</strong>
+            </div>
+        </div>
+    </div>
+</if>
+<if condition="$list_d">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div id="d_date" style="height:315px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div id="d_money" style="height:315px;"></div>
+            </div>
+        </div>
+    </div>
+    <else />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <strong style="font-size: 20px; color: red; padding:5px 10px;"> 没有30天内的订单数据</strong>
+            </div>
+        </div>
+    </div>
+</if>
+<!-- 全局js -->
+<include file="Public/footer"/>
+<script src="/Public/Front/js/echarts.common.min.js"></script>
+<script>
+    var myChartmonth = echarts.init(document.getElementById('h_time'));
+    // 使用刚指定的配置项和数据显示图表。
+    myChartmonth.setOption({
+        grid:{x:100,x2:50,y:70,y2:40,borderWidth:1},
+        title : {text: '24小时内成功率',subtext: ''},
+        tooltip : {trigger: 'axis'},
+        legend: {
+            x: 'center',y: '0',
+            data:['成功率'],
+            textStyle:{fontSize:14,color:'#b2b5c4'}
+        },
+        toolbox: {
+            show : false,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [{
+                axisLabel:{textStyle:{fontSize:14,color:'#5b6e89'}},
+                type : 'category',
+                boundaryGap : false,
+                data : [<{$list_h_str}>]
+            }],
+        yAxis : [{
+            splitLine:{show: true,lineStyle:{type:"dashed",color:"#dfdfdf",}},
+            axisLabel:{textStyle:{fontSize:14,color:'#5b6e89'}},
+            type : 'value'
+                }],
+        series : [{
+            name:'成功率',
+            type:'line',
+            smooth:true,
+            itemStyle: {
+                normal: {
+                    areaStyle: {
+                        type: 'default',
+                        color: {
+                            type: 'linear',x: 0,y: 0,x2: 0,y2: 1,
+                            colorStops: [{offset: 0, color: '#ffe9da'},{offset: 1, color: '#ffffff'}],
+                            globalCoord: false
+                        }
+                    },
+                    color:'#0bff41'
+                }
+            },
+            data:[<{$list_h.success_rate|implode=","}>]
+        }]
+    });
+</script>
+<script>
+    var myChartmonth = echarts.init(document.getElementById('h_money'));
+    // 使用刚指定的配置项和数据显示图表。
+    myChartmonth.setOption({
+        grid:{x:100,x2:50,y:70,y2:40,borderWidth:1},
+        title : {text: '24小时内交易统计',subtext: ''},
+        tooltip : {trigger: 'axis'},
+        legend: {
+            x: 'center',y: '0',
+            data:['交易金额','支出金额','收入金额'],
+            textStyle:{fontSize:14,color:'#b2b5c4'}
+        },
+        toolbox: {
+            show : false,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [{
+            axisLabel:{textStyle:{fontSize:14,color:'#5b6e89'}},
+            type : 'category',
+            boundaryGap : false,
+            data : [<{$list_h_str}>]
+    }],
+    yAxis : [{
+        splitLine:{show: true,lineStyle:{type:"dashed",color:"#dfdfdf",}},
+        axisLabel:{textStyle:{fontSize:14,color:'#5b6e89'}},
+        type : 'value'
+    }],
+        series : [
+        {
+            name:'交易金额',
+            type:'line',
+            smooth:true,
+            itemStyle: {
+                normal: {
+                    areaStyle: {
+                        type: 'default',
+                        color: {
+                            type: 'linear',x: 0,y: 0,x2: 0,y2: 1,
+                            colorStops: [{offset: 0, color: '#ffe9da'},{offset: 1, color: '#ffffff'}],
+                            globalCoord: false
+                        }
+                    },
+                    color:'#ff8b88'
+                }
+            },
+            data:[<{$list_h.amount|implode=","}>]
+        },
+        {
+            name:'支出金额',
+            type:'line',
+            smooth:true,
+            itemStyle: {
+                normal: {
+                    areaStyle: {
+                        type: 'default',
+                        color: {
+                            type: 'linear',x: 0,y: 0,x2: 0,y2: 1,
+                            colorStops: [{offset: 0, color: '#e7dde7'},{offset: 1, color: '#ffffff'}],
+                            globalCoord: false
+                        }
+                    },
+                    color:'#6e94ff'
+                }
+            },
+            data:[<{$list_h.actualamount|implode=","}>]
+        },
+        {
+            name:'收入金额',
+            type:'line',
+            smooth:true,
+            itemStyle: {
+                normal: {
+                    areaStyle: {
+                        type: 'default',
+                        color: {
+                            type: 'linear',x: 0,y: 0,x2: 0,y2: 1,
+                            colorStops: [{offset: 0, color: '#ffe9db'},{offset: 1, color: '#ffffff'}],
+                            globalCoord: false
+                        }
+                    },
+                    color:'#ffd74c'
+                }
+            },
+            data:[<{$list_h.poundage|implode=","}>]
+        },
+    ]
+    });
+</script>
+
+<script>
+    var myChartmonth = echarts.init(document.getElementById('d_date'));
+    // 使用刚指定的配置项和数据显示图表。
+    myChartmonth.setOption({
+        grid:{x:100,x2:50,y:70,y2:40,borderWidth:1},
+        title : {text: '每日成功率',subtext: ''},
+        tooltip : {trigger: 'axis'},
+        legend: {
+            x: 'center',y: '0',
+            data:['成功率'],
+            textStyle:{fontSize:14,color:'#b2b5c4'}
+        },
+        toolbox: {
+            show : false,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [{
+            axisLabel:{textStyle:{fontSize:14,color:'#5b6e89'}},
+            type : 'category',
+            boundaryGap : false,
+            data : [<{$list_d_str}>]
+    }],
+    yAxis : [{
+        splitLine:{show: true,lineStyle:{type:"dashed",color:"#dfdfdf",}},
+        axisLabel:{textStyle:{fontSize:14,color:'#5b6e89'}},
+        type : 'value'
+    }],
+        series : [{
+        name:'成功率',
+        type:'line',
+        smooth:true,
+        itemStyle: {
+            normal: {
+                areaStyle: {
+                    type: 'default',
+                    color: {
+                        type: 'linear',x: 0,y: 0,x2: 0,y2: 1,
+                        colorStops: [{offset: 0, color: '#ffe9da'},{offset: 1, color: '#ffffff'}],
+                        globalCoord: false
+                    }
+                },
+                color:'#0bff41'
+            }
+        },
+        data:[<{$list_d.success_rate|implode=","}>]
+    }]
+    });
+</script>
+
+<script>
+    var myChartmonth = echarts.init(document.getElementById('d_money'));
+    // 使用刚指定的配置项和数据显示图表。
+    myChartmonth.setOption({
+        grid:{x:100,x2:50,y:70,y2:40,borderWidth:1},
+        title : {text: '每日交易统计',subtext: ''},
+        tooltip : {trigger: 'axis'},
+        legend: {
+            x: 'center',y: '0',
+            data:['交易金额','支出金额','收入金额'],
+            textStyle:{fontSize:14,color:'#b2b5c4'}
+        },
+        toolbox: {
+            show : false,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [{
+            axisLabel:{textStyle:{fontSize:14,color:'#5b6e89'}},
+            type : 'category',
+            boundaryGap : false,
+            data : [<{$list_d_str}>]
+    }],
+    yAxis : [{
+        splitLine:{show: true,lineStyle:{type:"dashed",color:"#dfdfdf",}},
+        axisLabel:{textStyle:{fontSize:14,color:'#5b6e89'}},
+        type : 'value'
+    }],
+        series : [
+        {
+            name:'交易金额',
+            type:'line',
+            smooth:true,
+            itemStyle: {
+                normal: {
+                    areaStyle: {
+                        type: 'default',
+                        color: {
+                            type: 'linear',x: 0,y: 0,x2: 0,y2: 1,
+                            colorStops: [{offset: 0, color: '#ffe9da'},{offset: 1, color: '#ffffff'}],
+                            globalCoord: false
+                        }
+                    },
+                    color:'#ff8b88'
+                }
+            },
+            data:[<{$list_d.amount|implode=","}>]
+    },
+    {
+        name:'支出金额',
+            type:'line',
+        smooth:true,
+        itemStyle: {
+        normal: {
+            areaStyle: {
+                type: 'default',
+                    color: {
+                    type: 'linear',x: 0,y: 0,x2: 0,y2: 1,
+                        colorStops: [{offset: 0, color: '#e7dde7'},{offset: 1, color: '#ffffff'}],
+                        globalCoord: false
+                }
+            },
+            color:'#6e94ff'
+        }
+    },
+        data:[<{$list_d.actualamount|implode=","}>]
+    },
+    {
+        name:'收入金额',
+            type:'line',
+        smooth:true,
+        itemStyle: {
+        normal: {
+            areaStyle: {
+                type: 'default',
+                    color: {
+                    type: 'linear',x: 0,y: 0,x2: 0,y2: 1,
+                        colorStops: [{offset: 0, color: '#ffe9db'},{offset: 1, color: '#ffffff'}],
+                        globalCoord: false
+                }
+            },
+            color:'#ffd74c'
+        }
+    },
+        data:[<{$list_d.poundage|implode=","}>]
+    },
+    ]
+    });
+</script>
+</body>
+</html>

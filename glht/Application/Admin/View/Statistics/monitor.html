@@ -1,0 +1,113 @@
+<include file="Public/header"/>
+<div class="row">
+    <div class="col-md-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>安全信息监控</h5>
+            </div>
+            <div class="ibox-content">
+                <!--<div class="ibox-tools">-->
+                  <div class="layui-form-item layui-inline" style="line-height: 22px; margin: 5px;">
+                    <label class="layui-form-label" style="width: 80px;">刷新时间：</label>
+                    <div class="layui-input-inline" style="width: 50px;">
+                      <input type="text" id="time"  name="time" value="120" style=" width: 30px;" readonly> 秒
+                    </div>
+                    <a href="javascript:;" class="layui-btn layui-btn-small" onclick="set_time();" style="color: white">开始</a>
+                    <a href="javascript:;" class="layui-btn layui-btn-small" onclick="shua_end();" style="color: white">关闭</a>
+                    <a class="layui-btn layui-btn-small layui-btn-danger" href="<{$targetUrl}>" target="_blank">新窗口打开</a>
+                  </div>
+                <!--</div>-->
+            </div>
+            <!--条件查询-->
+            <div class="ibox-content">
+                <blockquote class="layui-elem-quote" style="font-size:14px;padding;8px;">
+                    最后 5 个商户信息： <br>
+                    <table style="margin-top:8px;">
+                        <thead>
+                            <tr class="layui-table channel_tr">
+                                <td style="width:80px;background-color:#cdd8f7">商户号</td>
+                                <td style="width:150px;background-color:#cdd8f7">用户名</td>
+                                <td style="width:150px;background-color:#cdd8f7">余额</td>
+                            <tr/>
+                        <volist name="stat.lastUser" id="uo" key="k">
+                            <tr class="layui-table channel_tr">
+                                <td style="width:80px;"><{$uo.id|shanghubianhao=###}></td>
+                                <td style="width:150px;"><{$uo.username}></td>
+                                <td style="width:150px;color: red;font-weight: 600;"><{$uo.balance_php}></td>
+                            <tr/>
+                        </volist>
+                        </thead>
+                    </table>
+                </blockquote>
+                <blockquote class="layui-elem-quote" style="font-size:14px;padding;8px;">
+                    商户总余额：<span class="label stat_success"><{$stat.total_menmber_balance}></span> 
+                </blockquote>
+                <blockquote class="layui-elem-quote" style="font-size:14px;padding;8px;">
+                    通道总余额： <span class="label stat_success"><{$stat.total_channel_balance}></span> 
+                    <br>
+                    <table style="margin-top:8px;">
+                        <thead>
+                            <tr class="layui-table channel_tr">
+                                <td style="width:200px;background-color:#cdd8f7">通道名称</td>
+                                <td style="width:180px;background-color:#cdd8f7">余额</td>
+                            <tr/>
+                        <volist name="stat.PayForAnother" id="vo" key="k">
+                            <tr class="layui-table channel_tr">
+                                <td style="width:200px;"><{$vo.title}></td>
+                                <td><span style="color: red;font-weight: 600;"><{$vo.balance}></span></td>
+                            <tr/>
+                        </volist>
+                    </table>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+</div>
+<include file="Public/footer"/>
+<script>
+    function set_time() {
+        // var t=document.getElementById("time").value;
+        var t=120;
+        document.cookie = "order_start=1";
+        document.cookie = "order_time=" + t;
+        location.replace(location.href);
+    }
+    function shua_end() {
+        delCookie("order_start");
+        location.replace(location.href);
+    }
+    var t = getCookie('order_time');
+    document.getElementById('time').value=t;
+    if(t > 1){
+        var intDiff = parseInt(t-1);//倒计时总秒数量
+        $(function () {
+            var start = getCookie('order_start');
+            if (start == 1) {
+                timer(intDiff);
+                setTimeout("location=location; ", intDiff * 1000);
+            }
+        });
+    }
+    function timer(intDiff) {
+        window.setInterval(function () {
+            if (intDiff > 0) intDiff--;
+        }, 1000);
+    }
+
+    function getCookie(name) {
+        var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+        if (arr = document.cookie.match(reg))
+            return unescape(arr[2]);
+        else
+            return null;
+    }
+    function delCookie(name) {
+        var exp = new Date();
+        exp.setTime(exp.getTime() - 1);
+        var cval = getCookie(name);
+        if (cval != null)
+            document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+    }
+</script>
+</body>
+</html>

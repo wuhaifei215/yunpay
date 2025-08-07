@@ -1,0 +1,196 @@
+<include file="Public/header"/>
+<style type="text/css">
+  .layui-table-cell {
+    height: inherit!important;
+  }
+  
+  .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none; /* 默认隐藏遮罩 */
+      z-index: 10;
+    }
+</style>
+<body id="iosiframe">
+<div class="row">
+    <div class="overlay" id="overlay"></div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="ibox float-e-margins">
+      <!--条件查询-->
+      <div class="ibox-title" style="height: 75px;">
+        <h5 style="height: 35px;">代收成功统计</h5>
+        
+      </div>
+      <!--条件查询-->
+      <div class="ibox-content">
+        <form class="layui-form layui-form-pane form-search" action="" method="get" autocomplete="off" id="orderform">
+          <input type="hidden" name="m" value="<{$model}>">
+          <input type="hidden" name="c" value="Order">
+          <input type="hidden" name="a" value="index" id="action">
+          <input type="hidden" name="p" value="1">
+          <input type="hidden" name="rows" id="rows" value="<{$rows}>">
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">商户号</label>
+            <div class="layui-input-inline">
+              <input type="text" name="memberid" id="memberid" value="<if condition="$memberid gt 0"><{$memberid|htmlspecialchars}></if>" placeholder="请输入商户号" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">交易金额</label>
+            <div class="layui-input-inline">
+              <input type="text" name="payamount" value="<{$payamount|htmlspecialchars}>" placeholder="请输入订单金额" class="layui-input">
+            </div>
+          </div>
+          <br>
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">通道类型</label>
+            <div class="layui-input-inline">
+              <select name="bank">
+                <option value="">全部类型</option>
+                <volist name="banklist" id="vo">
+                  <option <if condition="$bank eq $vo['id']">selected</if>
+                  value="<{$vo.id}>"><{$vo.name}></option>
+                </volist>
+              </select>
+            </div>
+          </div>
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">通道</label>
+            <div class="layui-input-inline">
+              <select name="tongdao" lay-filter="channel"  data-child="account">
+                <option value="">全部通道</option>
+                <volist name="tongdaolist" id="vo">
+                  <option <if condition="$tongdao eq $vo['id']">selected</if>
+                  value="<{$vo.id}>"><{$vo.title}></option>
+                </volist>
+              </select>
+            </div>
+          </div>
+          <br>
+          <!--<div class="layui-form-item layui-inline">-->
+          <!--  <label class="layui-form-label">创建时间</label>-->
+          <!--  <div class="layui-input-inline" style="width:270px;">-->
+          <!--    <input type="text" class="layui-input" name="createtime" id="createtime"-->
+          <!--           placeholder="创建起始时间" value="<{$createtime|htmlspecialchars}>" autocomplete="off">-->
+          <!--  </div>-->
+          <!--</div>-->
+          <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">成功时间</label>
+            <div class="layui-input-inline" style="width:270px;">
+              <input type="text" class="layui-input" name="successtime" id="successtime"
+                     placeholder="成功时间范围" value="<{$successtime|htmlspecialchars}>" autocomplete="off">
+            </div>
+          </div>
+          <div class="layui-form-item layui-inline">
+            <button type="submit" class="layui-btn"><span
+                    class="glyphicon glyphicon-search"></span> 搜索
+            </button>
+          </div>
+      </div>
+      </form>
+        <blockquote class="layui-elem-quote" style="padding;8px;">
+            <style type="text/css">
+                .channel_tr td{
+                    width:400px;
+                    font-size:18px;
+                }
+            </style>
+            <table>
+                <tr class="layui-table channel_tr">
+                    <td>成功交易总金额</td>
+                    <td><span class="stat_success"><{$stamount}>元</span> </td>
+                <tr/>
+                <tr class="layui-table channel_tr">
+                    <td>平台利润</td>
+                    <td><span class="stat_success"><{$strate}>元</span></td>
+                <tr/>
+                <tr class="layui-table channel_tr">
+                    <td>代理收入</td>
+                    <td><span class="stat_success"><{$memberprofit}>元</span> </td>
+                <tr/>
+                <tr class="layui-table channel_tr">
+                    <td>商户收入总金额</td>
+                    <td><span class="stat_success"><{$strealmoney}>元</span> </td>
+                <tr/>
+                <tr class="layui-table channel_tr">
+                    <td>成功订单数</td>
+                    <td><span class="stat_success"><{$success_count}></span> 
+                <tr/>
+                <!--<tr class="layui-table channel_tr">-->
+                <!--    <td>失败订单数</td>-->
+                <!--    <td><span class="stat_fail"><{$fail_count}></span></td>-->
+                <!--<tr/>-->
+                <!--<tr class="layui-table channel_tr">-->
+                <!--    <td>成功率</td>-->
+                <!--    <td><span class="stat_success"><{$success_rate}>%</span></td>-->
+                <!--<tr/>-->
+            </table>
+        </blockquote>
+    </div>
+  </div>
+
+</div>
+<include file="Public/footer"/>
+<script>
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'form'], function() {
+        var laydate = layui.laydate //日期
+            , laypage = layui.laypage //分页
+            ,layer = layui.layer //弹层
+            ,form = layui.form //表单
+            , table = layui.table; //表格
+        //日期时间范围
+        laydate.render({
+            elem: '#createtime'
+            , type: 'datetime'
+            ,theme: 'molv'
+            , range: '|'
+        });
+        //日期时间范围
+        laydate.render({
+            elem: '#successtime'
+            , type: 'datetime'
+            ,theme: 'molv'
+            , range: '|'
+        });
+        form.on('select(channel)', function(data){
+            var  channel_id = data.elem[data.elem.selectedIndex].value;
+            var name = data.elem.dataset.child;
+            if(channel_id) {
+                $.ajax({
+                    type:'get',
+                    data:{'channel_id':channel_id},
+                    dataType:'json',
+                    url:'<{:U("Order/getAccount")}>',
+                    success:function(info){
+                        if(info['status'] == 1){
+                            var selectName = $('select[name="' + name + '"]');
+                            selectName.html('<option value="">请选择</option>');
+                            for(k in info['data']){
+                                selectName.append('<option value="'+ info['data'][k]['id'] +'">' + info['data'][k]['title'] + '</option>');
+                                form.render('select');
+                            }
+                        }else{
+                            layer.msg('获取子账号列表失败',{time: 2000, icon:'error'});
+                        }
+                    },
+                    error:function(){
+                        layer.msg('通讯错误,请重新刷新页面',{time: 2000, icon:'error'});
+                    },
+                });
+            }
+        });
+    });
+        
+    document.getElementById("orderform").onsubmit = function(event){
+        // event.preventDefault(); // 阻止表单提交
+        $('#overlay').show();
+    }
+</script>
+</body>
+</html>

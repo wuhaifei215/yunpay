@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>等待支付</title>
+    <style>
+        input{
+            margin-top: 8px;
+        }
+        select{
+            margin-top: 8px;
+        }
+
+    </style>
+</head>
+<body style="text-align: center;padding-top: 10px;">
+<div id="app">
+    <form style="visibility:hidden; text-align:left;" ref="form" @submit.prevent="submit($event)"  action="" >
+
+        终端类型 <input name='service_id' value="{$send.service_id}"> <br/>
+        终端类型 <input name='sign_type' value="{$send.sign_type}"> <br/>
+        终端类型 <input name='tf_timestamp' value="{$send.tf_timestamp}"> <br/>
+
+        终端类型 <input name='terminal' value="{$send.terminal}"> <br/>
+        主号appid <input name='appid' value="{$send.appid}"><br/>
+        wxappid <input name='wxappid' value="{$send.wxappid}"> <br/>
+        wxopenid <input id="wxopenid" name='wxopenid' v-model="wxopenid"> <br/>
+        backurl <input name='backurl' value="{$send['backurl']}"> <br/>
+        fronturl <input name='fronturl' value="{$send['fronturl']}"> <br/>
+        商品名称:subject  <input name='subject' value="{$send.subject}"> <br/>
+        业务类型:businesstype  <input name='businesstype' value="{$send.businesstype}"><br/>
+        消费场景:kind  <input name='kind' value="{$send.kind}"><br/>
+        业务订单号:businessnumber  <input name='businessnumber' value="{$send['businessnumber']}"> <br/>
+
+        多级代理商编号:bankcode  <input name='bankcode' value="{$send['bankcode']}"> <br/>
+        多级代理商编号:aggregationcode  <input name='aggregationcode' value="{$send['aggregationcode']}"> <br/>
+        交易金额:billamount  <input name='billamount' value="{$send['billamount']}"><br/>
+        收款方支付账号:toaccountnumber  <input name='toaccountnumber' value="{$send['toaccountnumber']}"> <br/>
+        客户端请求IP:clientip  <input name='clientip' value="{$send['clientip']}"> <br/>
+        <input name='billsubtype' value="{$send['billsubtype']}"> <br/>
+        <input name='merchtonline' value="{$send['merchtonline']}"> <br/>
+        <div>
+            code {{wxcode}} <br/>
+            msg {{msg}} <br/>
+            data.link {{dataLink}} <br/>
+            formData {{formData1}} <br/>
+        </div>
+        <input ref="submitbut" type='submit' value='提交'>
+    </form>
+
+    <div style="font-size: 180px">
+        {{payResult}}
+    </div>
+</div>
+</body>
+<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/axios/0.18.0/axios.min.js"></script>
+
+<script type = "text/javascript">
+    new Vue({
+        el: '#app',
+        data () {
+            return {
+                info: '',
+                wxcode: '--',
+                payResult: '',
+                msg: '--',
+                dataLink: '--',
+                formData1: '--',
+                wxopenid: '',
+            }
+        },
+        created() {
+            this.getCode();
+        },
+
+        mounted () {
+        },
+        methods: {
+            submit(event) {
+                var formData = new FormData(event.target);
+                // var formData = new FormData(this.$refs['form']);
+                this.formData1 = JSON.stringify(formData);
+
+                let url = 'https://api.dlxinkexiangyiicp.com/mapi/order/Lines26_openid';
+                /*this.$http.post(, formData).then(res => {
+                    console.log(res);
+                }, err => {
+                    // error callback
+                    console.log(err);
+                });*/
+                let _this = this;
+                axios.post(url,formData).then(res => {
+                    console.log(res);
+                    if (typeof WeixinJSBridge == "undefined"){
+                        _this.msg = 'WeixinJSBridge undefined';
+                        if( document.addEventListener ){
+                            document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+                        }else if (document.attachEvent){
+                            document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+                            document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+                        }
+                    }else{
+                        _this.dataLink = 'onBridgeReady: ' + JSON.stringify(res.data);
+                        _this.onBridgeReady(res.data.link);
+                    }
+
+
+                }).catch(err => {
+                    console.log(err);
+                });
+            },
+            onBridgeReady(res) {
+                res = JSON.parse(res);
+                this.msg = "WeixinJSBridge.invoke:" + res;
+                let _this = this;
+                WeixinJSBridge.invoke(
+                    'getBrandWCPayRequest', res,
+                    function (res1) {
+                        _this.msg = res1.err_msg;
+                        if (res1.err_msg == "get_brand_wcpay_request:ok") {
+                            // 使用以上方式判断前端返回,微信团队郑重提示：
+                            //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+                            _this.payResult = "支付成功";
+                        } else {
+                            _this.payResult = "支付失败";
+                        }
+                    });
+
+                /* WeixinJSBridge.invoke(
+                     'getBrandWCPayRequest', {
+                         "appId": "wx2421b1c4370ec43b",     //公众号ID，由商户传入
+                         "timeStamp": "1395712654",         //时间戳，自1970年以来的秒数
+                         "nonceStr": "e61463f8efa94090b1f366cccfbbb444", //随机串
+                         "package": "prepay_id=u802345jgfjsdfgsdg888",
+                         "signType": "MD5",         //微信签名方式：
+                         "paySign": "70EA570631E4BB79628FBCA90534C63FF7FADD89" //微信签名
+                     },
+                     function (res) {
+                         this.msg = res.err_msg;
+                         if (res.err_msg == "get_brand_wcpay_request:ok") {
+                             // 使用以上方式判断前端返回,微信团队郑重提示：
+                             //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+                         }
+                     });*/
+            },
+
+            getCode () { // 非静默授权，第一次有弹框
+                // const APPID = 'wxd70123093eae2495';// 测试的
+                const APPID = 'wx827caa972b1c440a'; // 正式的
+                // const APP_KEY = 'a70f89e637affe7e45af2f169459b77c';
+
+                const code = this.getUrlParam('code') // 截取路径中的code，如果没有就去微信授权，如果已经获取到了就直接传code给后台获取openId
+                const local = window.location.href
+                if (code == null || code === '') {
+                    // console.log(encodeURIComponent(local));
+                    window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + APPID + '&redirect_uri=' + encodeURIComponent(local) + '&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect'
+                } else {
+                    this.wxcode = code;
+                    this.getOpenId(code) //把code传给后台获取用户信息
+                }
+            },
+            getOpenId (code) { // 通过code获取 openId等用户信息，/api/user/wechat/login 为后台接口
+                let _this = this
+                axios.get('https://api.dlxinkexiangyiicp.com/mapi/order/wxopenid', {params: {code: code}})
+                    .then(response => {
+                        _this.wxopenid = response.data;
+                        // _this.$refs.submitbut.dispatchEvent(new MouseEvent('click'));
+
+                        setTimeout(function() {
+                            _this.$refs.submitbut.dispatchEvent(new MouseEvent('click'));
+                        }, 500);
+
+                        //_this.$refs.submitbut.$el.click();
+                        //_this.$refs.submitbut.dispatchEvent(new MouseEvent('click'));
+                    })
+                    .catch(function (error) { // 请求失败处理
+                        console.log(error);
+                    });
+
+                /*
+                // 后端接口实现：获取code后，请求以下连接获取access_token: https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code
+                this.$http.get('/mapi/order/wxopenidByCode', {code: code}).then((res) => {
+                    let datas = res.data;
+                    _this.wxopenid = response.data;
+                    /!* // 前端--> 应用后台 --> 微信后台
+                    {
+                        "access_token": "ACCESS_TOKEN",
+                        "expires_in": 7200,
+                        "refresh_token": "REFRESH_TOKEN",
+                        "openid": "OPENID",
+                        "scope": "SCOPE"
+                    }
+                    *!/
+                    if (datas.code === 0 ) {
+                        console.log('成功')
+                    }
+                }).catch((error) => {
+                    console.log(error)
+                })*/
+            },
+            getUrlParam (name) { // 获取url指定参数
+                var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)') // 构造一个含有目标的正则表达式对象
+                var r = window.location.search.substr(1).match(reg) // 匹配目标参数
+                if (r != null) return unescape(r[2])
+                return null // 返回参数值
+
+            }
+        }
+    })
+</script>
+</html>

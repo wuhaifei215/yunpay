@@ -1,0 +1,214 @@
+<?php
+namespace Admin\Controller;
+
+class IndexController extends BaseController
+{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    //首页
+    public function index()
+    {
+        $Websiteconfig = D("Websiteconfig");
+        $withdraw = $Websiteconfig->getField("withdraw");
+        $this->assign("withdraw", $withdraw);
+        $this->display();
+    }
+
+    //main
+    public function main()
+    {
+        if(IS_AJAX){
+            $time_d = strtotime(date("Y-m-d", time()) . " 00:00:00");
+            for ($i = 30; 0 < $i; $i--) {
+                $where_d = $data_d = array();
+                $time_start_d = $time_d - $i * 3600 * 24;
+                $time_end_d = $time_d - ($i-1) * 3600 * 24;
+                $where_d['pay_applydate'] = ['between', [$time_start_d, $time_end_d]];
+
+                //总数
+                $all_d = M('Order')->where($where_d)->count('id');
+                //成功
+                $where_d['pay_status'] = ['between', [1, 2]];
+                $field = ['sum(`pay_amount`) amount', 'sum(`pay_poundage`) poundage', 'sum(`pay_actualamount`) actualamount', 'count(`id`) Success_count'];
+                $data_d = M('Order')->field($field)->where($where_d)->find();
+
+                $list_d['amount'][$i] = $data_d['amount'] ? $data_d['amount'] : 0;
+                $list_d['total'][$i] = $data_d['actualamount'] ? $data_d['actualamount'] : 0;
+                $list_d['rate'][$i] = $data_d['poundage'] ? $data_d['poundage'] : 0;
+
+                $list_d['time'][$i] = date('m月d日', $time_start_d);
+            }
+//            $list_d['amount'] = "'" . implode("' , '", $list_d['amount']) . "'";
+//            $list_d['total'] = "'" . implode("' , '", $list_d['total']) . "'";
+//            $list_d['rate'] = "'" . implode("' , '", $list_d['rate']) . "'";
+//            $list_d['str'] = "'" . implode("' , '", $list_d['time']) . "'";
+            $list_d['amount'] = implode(",", $list_d['amount']);
+            $list_d['total'] = implode(",", $list_d['total']);
+            $list_d['rate'] = implode(",", $list_d['rate']);
+            $list_d['str'] = implode(",", $list_d['time']);
+            $info = [
+                'code' => 0,
+                'data' => $list_d,
+            ];
+            $this->ajaxReturn($info);
+        }else{
+            //日报
+            $_data['today'] = date('Y年m月d日');
+            $_data['month'] = date('Y年m月');
+
+            $beginThismonth = mktime(0, 0, 0, date('m'), 1, date('Y'));
+            $endThismonth = mktime(23, 59, 59, date('m'), date('t'), date('Y'));
+
+            //实时统计
+            $orderWhere = [
+                'pay_status' => ['between', [1, 2]],
+                'pay_successdate' => [
+                    'between',
+                    [
+                        strtotime('today'),
+                        strtotime('tomorrow'),
+                    ],
+                ],
+            ];
+            $ddata = M('Order')
+                ->field([
+                    'sum(`pay_amount`) amount',
+                    'sum(`pay_poundage`) rate',
+                    'sum(`pay_actualamount`) total',
+                ])->where($orderWhere)
+                ->find();
+
+            $ddata['num'] = M('Order')->where($orderWhere)->count();
+
+            //7天统计
+            $lastweek = time() - 7 * 86400;
+            $sql = "select COUNT(id) as num,SUM(pay_amount) AS amount,SUM(pay_poundage) AS rate,SUM(pay_actualamount) AS total from pay_order where  1=1 and pay_status>=1 and DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(FROM_UNIXTIME(pay_successdate,'%Y-%m-%d')) and pay_successdate>=$lastweek; ";
+            $wdata = M('Order')->query($sql);
+
+            //按月统计
+            $lastyear = strtotime(date('Y-1-1'));
+            $sql = "select FROM_UNIXTIME(pay_successdate,'%Y年-%m月') AS month,SUM(pay_amount) AS amount,SUM(pay_poundage) AS rate,SUM(pay_actualamount) AS total from pay_order where  1=1 and pay_status>=1 and pay_successdate>=$lastyear GROUP BY month;  ";
+            $_mdata = M('Order')->query($sql);
+            $mdata = [];
+            foreach ($_mdata as $item) {
+                $mdata['amount'][] = $item['amount'] ? $item['amount'] : 0;
+                $mdata['mdate'][] = "'" . $item['month'] . "'";
+                $mdata['total'][] = $item['total'] ? $item['total'] : 0;
+                $mdata['rate'][] = $item['rate'] ? $item['rate'] : 0;
+            }
+            //平台总入金
+            $stat['allordersum'] = M('Order')->where(['pay_status' => ['in', '1,2'], ['lock_status' => ['neq', 1]]])->sum('pay_amount');
+            //商户总分成
+            $stat['allmemberprofit'] = M('moneychange')->where(['lx' => 9])->sum('money');
+            //平台总分成
+            $all_income_profit = M('Order')->where(['pay_status' => ['in', '1,2'], ['lock_status' => ['neq', 1]]])->sum('pay_poundage');
+
+            $all_order_cost = M('Order')->where(['pay_status' => ['in', '1,2'], ['lock_status' => ['neq', 1]]])->sum('cost');
+            $all_pay_cost = M('wttklist')->where(['status' => 2])->sum('cost');
+            $stat['allplatformincome'] = $all_income_profit - $all_order_cost - $all_pay_cost - $stat['allmemberprofit'];
+            $todayBegin = date('Y-m-d') . ' 00:00:00';
+            $todyEnd = date('Y-m-d') . ' 23:59:59';
+            //今日平台总入金
+            $stat['todayordersum'] = M('Order')->where(['pay_applydate' => ['between', [strtotime($todayBegin), strtotime($todyEnd)]], 'pay_status' => ['in', '1,2']])->sum('pay_amount');
+            //今日商户总分成
+            $stat['todaymemberprofit'] = M('moneychange')->where(['datetime' => ['between', [$todayBegin, $todyEnd]], 'lx' => 9])->sum('money');
+            //今日平台总分成
+            $income_profit = M('Order')->where(['pay_successdate' => ['between', [strtotime($todayBegin), strtotime($todyEnd)]], 'pay_status' => ['in', '1,2']])->sum('pay_poundage');
+
+            $order_cost = M('Order')->where(['pay_successdate' => ['between', [strtotime($todayBegin), strtotime($todyEnd)]], 'pay_status' => ['in', '1,2']])->sum('cost');
+            $pay_cost = M('wttklist')->where(['sqdatetime' => ['between', [$todayBegin, $todyEnd]], 'status' => 2])->sum('cost');
+            $stat['todayplatformincome'] = $income_profit - $order_cost - $pay_cost - $stat['todaymemberprofit'];
+            foreach ($stat as $k => $v) {
+                $stat[$k] = $v + 0;
+            }
+        }
+
+
+        $this->assign('stat', $stat);
+        $this->assign('ddata', $ddata);
+        $this->assign('wdata', $wdata[0]);
+        $this->assign('mdata', $mdata);
+        $this->assign('list_d', $list_d);
+        $this->assign('list_d_str', $list_d_str);
+        $this->display();
+    }
+
+    /**
+     * 清除缓存
+     */
+    public function clearCache()
+    {
+        $groupid = session('admin_auth.groupid');
+        if ($groupid == 1) {
+            $dir = RUNTIME_PATH;
+            $this->delCache($dir);
+            $this->success('缓存清除成功！');
+        } else {
+            $this->error('只有总管理员能操作！');
+        }
+    }
+
+    /**
+     * 删除缓存目录
+     * @param $dirname
+     * @return bool
+     */
+    protected function delCache($dirname)
+    {
+        $result = false;
+        if (!is_dir($dirname)) {
+            echo " $dirname is not a dir!";
+            exit(0);
+        }
+        $handle = opendir($dirname); //打开目录
+        while (($file = readdir($handle)) !== false) {
+            if ($file != '.' && $file != '..') {
+                //排除"."和"."
+                $dir = $dirname . DIRECTORY_SEPARATOR . $file;
+                is_dir($dir) ? self::delCache($dir) : unlink($dir);
+            }
+        }
+        closedir($handle);
+        $result = rmdir($dirname) ? true : false;
+        return $result;
+    }
+
+
+    public function MP3File()
+    {
+        if ($_POST) {
+//            $where['sqdatetime'] = ['between', ['2019-03-05 19:56:18', '2019-03-05 19:56:38']];
+            $where['sqdatetime'] = ['between', [date('Y-m-d H:i:s', time() - 600), date('Y-m-d H:i:s', time())]];
+            $where['status'] = ['eq', 0];
+            $list = M('Wttklist')->field('id')->where($where)->order('id desc')->find();
+//            $list = M('Wttklist')->where($where)->order('id desc')->select();
+            if ($list) {
+                $this->ajaxReturn(['status' => 1]);
+            }
+        }
+        $this->display();
+    }
+
+
+
+    // public function myupdata(){
+    //     $list = M('Order')->where(array('channel_id' => '218' ))->select();
+    //     // $i=0;
+    //     foreach ($list as $key => $value) {
+    //         // if ($value['cost']=='0') {
+    //             // $chage=$value['pay_amount']*0.0048;
+    //             $list = M('Order')->where(array('id' => $value['id']))->save(array('cost' => 0));
+    //             if ($list) {
+    //                $i++;
+    //             }
+    //         // }
+
+    //     }
+    //     print_r($i);die();
+
+    // }
+
+}

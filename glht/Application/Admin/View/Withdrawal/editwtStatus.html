@@ -1,0 +1,138 @@
+<include file="Public/header"/>
+<div class="row">
+    <div class="col-md-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <form class="layui-form" action="" autocomplete="off" id="editwtstatus">
+                    <input type="hidden" name="id" value="<{$info.id}>">
+                    <input type="hidden" name="userid" value="<{$info.userid}>">
+                    <input type="hidden" name="tkmoney" value="<{$info.tkmoney}>">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <div class="layui-input-inline" style="width:300px;">
+                                <select name="status">
+                                    <option value="">选择操作</option>
+                                    <option <if condition="$info['status'] eq 1">selected</if> value="2">变更为成功</option>
+                                    <option <if condition="$info['status'] eq 4">selected</if> value="4">变更为失败</option>
+                                    <option <if condition="$info['status'] eq 6">selected</if> value="6">驳回结算</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item layui-form-text">
+                        <div class="layui-inline">
+                            <div class="layui-input-inline" style="width:300px;">
+                                <textarea placeholder="备注" class="layui-textarea" name="memo"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <if condition="$verifyGoogle and $verifysms">
+        				<div class="layui-form-item" id="df_auto_check">
+        					<label class="layui-form-label">验证方式：</label>
+        					<div class="layui-input-block">
+        						<input type="radio" name="auth_type" lay-filter="auth_type" value="1" title="谷歌安全码" checked>
+        						<input type="radio" name="auth_type" lay-filter="auth_type" value="0" title="短信验证码">
+        					</div>
+        				</div>
+    				<else />
+    					<input type="hidden" name="auth_type" value="<{$auth_type}>">
+    				</if>
+    				<eq name="verifyGoogle" value="1">
+    				<div class="layui-form-item" id="auth_google">
+    					<label class="layui-form-label">谷歌安全码：</label>
+    					<div class="layui-input-inline">
+    						<input type="text" name="google_code" autocomplete="off"
+    							   placeholder="请输入谷歌安全码" class="layui-input" value="">
+    					</div>
+    				</div>
+    				</eq>
+    				<eq name="verifysms" value="1">
+    					<div class="layui-form-item" id="auth_sms" <if condition="$verifyGoogle and $verifysms">style="display: none"</if>>
+    						<label class="layui-form-label">手机验证码：</label>
+    					<div class="layui-input-inline">
+    						<input type="text" name="code"  autocomplete="off"
+    							   placeholder="请输入短信验证码" class="layui-input" value="">
+    					</div>
+    					<div class="layui-input-inline">
+    						<a href="javascript:;" id="sendBtn" data-mobile="<{$mobile}>" class="layui-btn">发送验证码</a>
+    					</div>
+    				</div>
+    				</eq>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <button class="layui-btn" lay-submit="" lay-filter="wtsave">立即提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<include file="Public/footer"/>
+<script>
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'form'], function () {
+        var laydate = layui.laydate //日期
+            , laypage = layui.laypage //分页
+            , layer = layui.layer //弹层
+            , form = layui.form //表单
+            , table = layui.table; //表格
+        var i=0;
+        //监听提交
+        form.on('submit(wtsave)', function (data) {
+            var memo = $("#memo").val();
+            if (memo == '') {
+                layer.alert('请填写备注');
+                return false;
+            }
+            i++;
+            var loading = '';
+            if(i==1){
+                $.ajax({
+                    url: "<{:U('Admin/Withdrawal/editwtStatus')}>",
+                    type: "post",
+                    data: $('#editwtstatus').serialize(),
+                    beforeSend:function(){
+                        loading=layer.load();
+        			},
+                    success: function (res) {
+                        layer.close(loading);
+                        if (res.status) {
+                            layer.alert("编辑成功", {icon: 6}, function () {
+                                parent.location.reload();
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+                            });
+                        } else {
+                            layer.msg(res.msg ? res.msg : "操作失败!", {icon: 5}, function () {
+                                parent.location.reload();
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+                            });
+                            return false;
+                        }
+                    },
+                    complete: function(){
+                          layer.close(loading);
+        			  },
+        			error:function(){
+                          layer.close(loading);
+                          layer.alert('连接错误');
+        			  }
+                });
+                return false;
+            }
+        });
+        form.on('radio(auth_type)',function(data){
+        if(data.value == 1) {
+            $('#auth_google').show();
+            $('#auth_sms').hide();
+        } else {
+            $('#auth_google').hide();
+            $('#auth_sms').show();
+        }
+    });
+    });
+</script>
+</body>
+</html>
