@@ -15,9 +15,8 @@ return array(
     'DB_SLAVE_NO'           =>  1, // 指定从服务器序号
 
     
-    'REDIS_HOST'   => '172.31.39.165',       // 服务器地址
+    'REDIS_HOST'   => '172.31.42.187',       // 服务器地址
     'REDIS_PORT'   => '52940',       // 端口
     'REDIS_PWD'   => 'Yun!x@y#z99pay',       //密码
     'REDIS_SELECT' => '0',
 );
-
